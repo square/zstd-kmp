@@ -32,9 +32,6 @@ internal actual fun zstdCompressor(): ZstdCompressor = JniZstdCompressor()
 
 internal actual fun zstdDecompressor(): ZstdDecompressor = JniZstdDecompressor()
 
-@JvmName("isError")
-internal external fun isError(code: Long): Boolean
-
 @JvmName("getErrorName")
 internal actual external fun getErrorName(code: Long): String?
 

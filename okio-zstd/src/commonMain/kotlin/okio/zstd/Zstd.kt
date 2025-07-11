@@ -18,6 +18,7 @@
 
 package okio.zstd
 
+import kotlin.jvm.JvmName
 import okio.IOException
 import okio.Sink
 import okio.Source

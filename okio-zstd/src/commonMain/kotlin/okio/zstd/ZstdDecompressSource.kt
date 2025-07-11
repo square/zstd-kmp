@@ -15,12 +15,14 @@
  */
 package okio.zstd
 
+import kotlin.jvm.JvmField
 import okio.Buffer
 import okio.Buffer.UnsafeCursor
 import okio.BufferedSource
 import okio.EOFException
 import okio.Source
 import okio.Timeout
+import okio.use
 
 /**
  * This satisfies reads with the following process:

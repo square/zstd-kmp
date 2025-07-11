@@ -15,7 +15,6 @@
  */
 #include <jni.h>
 #include <zstd.h>
-#include <iostream>
 
 /**
  * Support for operating on JVM objects from native code.
@@ -43,11 +42,6 @@ JniZstd::JniZstd(JNIEnv *env, jclass unsafeCursorClass, jclass zstdCompressorCla
     zstdCompressorInputBytesProcessed(env->GetFieldID(zstdCompressorClass, "inputBytesProcessed", "I")),
     zstdDecompressorOutputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "outputBytesProcessed", "I")),
     zstdDecompressorInputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "inputBytesProcessed", "I")) {
-}
-
-extern "C" JNIEXPORT jboolean JNICALL
-Java_okio_zstd_JniZstd_isError(JNIEnv* env, jobject type, jlong code) {
-  return ZSTD_isError(static_cast<size_t>(code));
 }
 
 extern "C" JNIEXPORT jstring JNICALL

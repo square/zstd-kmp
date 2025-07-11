@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(ExperimentalForeignApi::class)
+
 package okio.zstd
 
-import kotlin.jvm.JvmField
-import okio.Buffer.UnsafeCursor
-import okio.Closeable
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.toKString
+import okio.zstd.internal.ZSTD_getErrorName
+import okio.zstd.internal.ZSTD_isError
 
-internal abstract class ZstdDecompressor : Closeable {
-  /** The number of bytes consumed on the most recent call to [decompressStream]. */
-  @JvmField
-  var inputBytesProcessed: Int = -1
+internal actual fun zstdCompressor(): ZstdCompressor = NativeZstdCompressor()
 
-  /** The number of bytes produced on the most recent call to [decompressStream]. */
-  @JvmField
-  var outputBytesProcessed: Int = -1
+internal actual fun zstdDecompressor(): ZstdDecompressor = NativeZstdDecompressor()
 
-  abstract fun decompressStream(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
-  ): Long
+internal actual fun getErrorName(code: Long): String? {
+  if (ZSTD_isError(code.toULong()) == 0U) return null
+  return ZSTD_getErrorName(code.toULong())?.toKString()
 }
