@@ -1,0 +1,51 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '**'
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+
+jobs:
+  publish:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version-file: .github/workflows/.java-version
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.0
+
+      - run: zig build -p src/jvmMain/resources/jni
+        working-directory: okio-zstd
+
+      - run: ./gradlew publishToMavenCentral :dokkaHtmlMultiModule
+        if: ${{ github.repository == 'square/okio-zstd' }}
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SECRET_PASSPHRASE }}
+
+      - uses: ffurrer2/extract-release-notes@v2
+        id: release_notes
+
+      - name: Deploy docs to website
+        if: ${{ github.repository == 'square/okio-zstd' }}
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: site
+          FOLDER: build/dokka/htmlMultiModule/
+          TARGET_FOLDER: docs/1.x/
+          CLEAN: true

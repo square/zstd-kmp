@@ -1,0 +1,18 @@
+[versions]
+kotlin = "2.1.21"
+okio = "3.13.0"
+
+[libraries]
+assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
+binary-compatibility-validator-gradle-plugin = { module = "org.jetbrains.kotlinx.binary-compatibility-validator:org.jetbrains.kotlinx.binary-compatibility-validator.gradle.plugin", version = "0.17.0" }
+cklib-gradle-plugin = { module = "co.touchlab:cklib-gradle-plugin", version = "0.3.4" }
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version = "2.0.0" }
+junit = { module = "junit:junit", version = "4.13.2" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+mavenPublish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.33.0" }
+okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
+shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:shadow", version = "8.0.0" }
+lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-4"
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version = "7.0.4" }
