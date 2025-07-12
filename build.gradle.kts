@@ -19,6 +19,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
+    classpath(libs.android.gradle.plugin)
     classpath(libs.binary.compatibility.validator.gradle.plugin)
     classpath(libs.mavenPublish.gradle.plugin)
     classpath(libs.kotlin.gradle.plugin)

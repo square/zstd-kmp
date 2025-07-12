@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:JvmName("JniZstd")
+@file:JvmName("JvmZstd")
 
 package okio.zstd
 
@@ -23,29 +23,8 @@ import okio.FileSystem
 import okio.Path.Companion.toOkioPath
 import okio.Path.Companion.toPath
 
-internal val jniZstdPointer: Long = run {
-  loadNativeLibrary()
-  createJniZstd()
-}
-
-internal actual fun zstdCompressor(): ZstdCompressor = JniZstdCompressor()
-
-internal actual fun zstdDecompressor(): ZstdDecompressor = JniZstdDecompressor()
-
-@JvmName("getErrorName")
-internal actual external fun getErrorName(code: Long): String?
-
-@JvmName("createJniZstd")
-internal external fun createJniZstd(): Long
-
-@JvmName("createZstdCompressor")
-internal external fun createZstdCompressor(): Long
-
-@JvmName("createZstdDecompressor")
-internal external fun createZstdDecompressor(): Long
-
 @Suppress("UnsafeDynamicallyLoadedCode") // Only loading from our own JAR contents.
-internal fun loadNativeLibrary() {
+internal actual fun loadNativeLibrary() {
   val osName = System.getProperty("os.name").lowercase(US)
   val osArch = System.getProperty("os.arch").lowercase(US)
   val resourcePath = when {
