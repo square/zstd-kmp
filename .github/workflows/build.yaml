@@ -40,12 +40,19 @@ jobs:
       fail-fast: false
       matrix:
         platform:
+          - os: macos-13
+            task: macosX64Test
           - os: macos-latest
+            task: macosArm64Test
+          - os: ubuntu-latest
+            task: linuxX64Test
 
     runs-on: ${{ matrix.platform.os }}
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # ratchet:actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -56,7 +63,7 @@ jobs:
           name: jni-binaries
           path: okio-zstd/src/jvmMain/resources/jni
 
-      - run: ./gradlew jvmTest apiCheck --stacktrace
+      - run: ./gradlew jvmTest ${{ matrix.platform.task }} apiCheck --stacktrace
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
         if: ${{ always() }}
@@ -72,6 +79,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # ratchet:actions/setup-java@v4
         with:
           distribution: 'zulu'
