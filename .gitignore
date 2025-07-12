@@ -1,0 +1,32 @@
+# IntelliJ IDEA
+.idea
+!/.idea/copyright
+*.iml
+
+# Gradle
+.gradle
+build/
+local.properties
+reports
+jacoco.exec
+.externalNativeBuild
+.cxx
+.kotlin
+
+# iOS
+*.pbxuser
+# Ignore generated Xcode projects
+*.xcworkspace
+xcuserdata
+Pods
+
+# Release
+docs/0.x
+
+# Zig
+.zig-cache
+zig-out
+
+# Binaries
+okio-zstd/src/jvmMain/resources/jni/**/*.dylib
+okio-zstd/src/jvmMain/resources/jni/**/*.so

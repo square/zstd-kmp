@@ -1,0 +1,5 @@
+public final class okio/zstd/Zstd {
+	public static final fun zstdCompress (Lokio/Sink;)Lokio/Sink;
+	public static final fun zstdDecompress (Lokio/Source;)Lokio/Source;
+}
+
