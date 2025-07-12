@@ -26,7 +26,7 @@ import okio.source
 import okio.use
 
 /**
- * Decompress this buffer using Zstd-jni and return the result.
+ * Decompress this buffer using luben Zstd-jni and return the result.
  *
  * Note that this doesn't use [com.github.luben.zstd.Zstd.decompress] because those functions don't
  * work on data that was compressed in a stream.
