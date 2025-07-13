@@ -15,21 +15,22 @@
  */
 package okio.zstd
 
-import kotlin.jvm.JvmField
-import okio.Buffer.UnsafeCursor
-import okio.Closeable
+import okio.Buffer
+import okio.ByteString
+import okio.Source
+import okio.buffer
+import okio.use
 
-internal abstract class ZstdDecompressor : Closeable {
-  /** The number of bytes consumed on the most recent call to [decompressStream]. */
-  @JvmField
-  var inputBytesProcessed: Int = -1
+actual fun Buffer.referenceDecompress(): ByteString {
+  zstdDecompress().buffer().use {
+    return it.readByteString()
+  }
+}
 
-  /** The number of bytes produced on the most recent call to [decompressStream]. */
-  @JvmField
-  var outputBytesProcessed: Int = -1
-
-  abstract fun decompressStream(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
-  ): Long
+actual fun Source.referenceCompress(): Buffer {
+  val result = Buffer()
+  result.zstdCompress().buffer().use {
+    it.writeAll(this@referenceCompress)
+  }
+  return result
 }

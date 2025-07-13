@@ -15,6 +15,7 @@
  */
 package okio.zstd
 
+import kotlin.jvm.JvmField
 import okio.Buffer.UnsafeCursor
 import okio.Closeable
 

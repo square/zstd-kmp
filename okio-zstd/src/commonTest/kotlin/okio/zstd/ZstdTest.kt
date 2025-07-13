@@ -17,9 +17,7 @@ package okio.zstd
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
 import assertk.assertions.isNull
-import assertk.assertions.isTrue
 import kotlin.test.Test
 import okio.ByteString.Companion.decodeHex
 import okio.ByteString.Companion.encodeUtf8
@@ -30,12 +28,6 @@ import okio.ByteString.Companion.encodeUtf8
 internal class ZstdTest {
   private val helloWorld = "hello world".encodeUtf8()
   private val helloWorldZstd = "28b52ffd200b59000068656c6c6f20776f726c64".decodeHex()
-
-  @Test
-  fun isError() {
-    assertThat(isError(ZSTD_error_no_error)).isFalse()
-    assertThat(isError(ZSTD_error_GENERIC)).isTrue()
-  }
 
   @Test
   fun getErrorName() {

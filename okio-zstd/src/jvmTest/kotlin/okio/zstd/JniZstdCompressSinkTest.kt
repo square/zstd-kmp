@@ -32,32 +32,9 @@ import okio.Pipe
 import okio.Sink
 import okio.buffer
 import okio.source
+import okio.use
 
-class ZstdCompressSinkTest {
-  @Test
-  fun compressEmpty() {
-    testRoundTrip(0)
-  }
-
-  @Test
-  fun compressSingleSegment() {
-    testRoundTrip(1024)
-  }
-
-  @Test
-  fun compressMultipleSegments() {
-    testRoundTrip(1024 * 1024)
-  }
-
-  private fun testRoundTrip(byteCount: Int) {
-    val compressed = Buffer()
-    compressed.zstdCompress().buffer().use {
-      it.writeAll(RandomSource(Random(1), byteCount))
-    }
-    assertThat(compressed.lubenDecompress())
-      .isEqualTo(RandomSource(Random(1), byteCount).buffer().readByteString())
-  }
-
+class JniZstdCompressSinkTest {
   /** Confirm we can clean up even if writes aren't working. */
   @Test
   fun writeFailure() {

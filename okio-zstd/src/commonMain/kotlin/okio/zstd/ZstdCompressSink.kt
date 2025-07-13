@@ -15,12 +15,14 @@
  */
 package okio.zstd
 
+import kotlin.jvm.JvmField
 import okio.Buffer
 import okio.Buffer.UnsafeCursor
 import okio.BufferedSink
 import okio.IOException
 import okio.Sink
 import okio.Timeout
+import okio.use
 
 /**
  * This stages all written bytes to [inputBuffer], and then emits to [sink] on these triggers:

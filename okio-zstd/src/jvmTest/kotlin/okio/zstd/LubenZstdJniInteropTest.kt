@@ -45,7 +45,7 @@ internal class LubenZstdJniInteropTest {
   fun okioCompressLubenDecompress() {
     val original = "hello world".encodeUtf8()
     val compressed = compress(original)
-    val decompressed = compressed.lubenDecompress()
+    val decompressed = compressed.referenceDecompress()
     assertThat(decompressed).isEqualTo(original)
   }
 

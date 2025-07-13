@@ -17,8 +17,6 @@ package okio.zstd
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.luben.zstd.ZstdInputStream
-import com.github.luben.zstd.ZstdOutputStream
 import kotlin.random.Random
 import okio.Buffer
 import okio.Buffer.UnsafeCursor
@@ -26,9 +24,7 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import okio.Source
 import okio.Timeout
-import okio.buffer
-import okio.sink
-import okio.source
+import okio.use
 
 /** Returns [byteCount] bytes from [random]. */
 class RandomSource(
@@ -51,30 +47,11 @@ class RandomSource(
   }
 }
 
-/**
- * Decompress this buffer using Zstd-jni and return the result.
- *
- * Note that this doesn't use [com.github.luben.zstd.Zstd.decompress] because those functions don't
- * work on data that was compressed in a stream.
- */
-fun Buffer.lubenDecompress(): ByteString {
-  val result = Buffer()
-  ZstdInputStream(inputStream()).source().use {
-    result.writeAll(it)
-  }
-  return result.readByteString()
-}
+/** Decompress using a different implementation, where available. */
+expect fun Buffer.referenceDecompress(): ByteString
 
-/**
- * Compress this source using Zstd-jni and return the result.
- */
-fun Source.lubenCompress(): Buffer {
-  val result = Buffer()
-  ZstdOutputStream(result.outputStream()).sink().buffer().use {
-    it.writeAll(this@lubenCompress)
-  }
-  return result
-}
+/** Compress using a different implementation, where available. */
+expect fun Source.referenceCompress(): Buffer
 
 fun oneShotCompress(
   original: ByteString,
@@ -85,7 +62,7 @@ fun oneShotCompress(
   checksumFlag: Int? = null,
   outputArraySize: Int = 1024,
 ): ByteString {
-  JniZstdCompressor().use { compressor ->
+  zstdCompressor().use { compressor ->
     compressionLevel?.let {
       compressor.setParameter(ZSTD_c_compressionLevel, it).checkError()
     }
@@ -120,7 +97,7 @@ fun oneShotDecompress(
   outputOffset: Int = 0,
   outputArraySize: Int = 1024,
 ): ByteString {
-  JniZstdDecompressor().use { decompressor ->
+  zstdDecompressor().use { decompressor ->
     val inputArray = ByteArray(compressed.size + inputOffset + inputPadding)
     compressed.copyInto(0, inputArray, inputOffset, compressed.size)
 
