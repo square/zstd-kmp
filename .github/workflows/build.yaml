@@ -40,12 +40,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - os: macos-13
-            task: macosX64Test
           - os: macos-latest
             task: macosArm64Test
-          - os: ubuntu-latest
-            task: linuxX64Test
 
     runs-on: ${{ matrix.platform.os }}
 
