@@ -2,16 +2,32 @@
 
 Build the native libraries:
 
+# Git Submodules
+
 ```
-brew install zig
 git submodule init
 git submodule update
-pushd okio-zstd
-zig build -p src/jvmMain/resources/jni
-popd
 ```
 
-Test it:
+# cmake
+
+```
+brew install cmake
+```
+
+# macOS
+
+```
+./okio-zstd/src/jvmMain/build-mac.sh
+```
+
+# Linux
+
+```
+./okio-zstd/src/jvmMain/build-linux.sh
+```
+
+# Test it:
 
 ```
 ./gradlew okio-zstd:jvmTest

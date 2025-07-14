@@ -28,13 +28,13 @@ internal actual fun loadNativeLibrary() {
   val osName = System.getProperty("os.name").lowercase(US)
   val osArch = System.getProperty("os.arch").lowercase(US)
   val resourcePath = when {
-    osName.contains("linux") -> "/jni/$osArch/libzstd.so".toPath()
-    osName.contains("mac") -> "/jni/$osArch/libzstd.dylib".toPath()
+    osName.contains("linux") -> "/jni/$osArch/libokio-zstd.so".toPath()
+    osName.contains("mac") -> "/jni/$osArch/libokio-zstd.dylib".toPath()
     else -> error("Unsupported OS: $osName")
   }
 
   // File-based deleteOnExit() uses a special internal shutdown hook that always runs last.
-  val tempFile = Files.createTempFile("zstd", null)
+  val tempFile = Files.createTempFile("okio-zstd", null)
   tempFile.toFile().deleteOnExit()
 
   FileSystem.RESOURCES.read(resourcePath) {
