@@ -16,7 +16,6 @@
 package okio.zstd
 
 import kotlin.jvm.JvmField
-import okio.Buffer.UnsafeCursor
 import okio.Closeable
 
 internal abstract class ZstdCompressor : Closeable {
@@ -33,8 +32,12 @@ internal abstract class ZstdCompressor : Closeable {
 
   /** @param mode one of [ZSTD_e_continue], [ZSTD_e_flush], or [ZSTD_e_end]. */
   abstract fun compressStream2(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
     mode: Int,
   ): Long
 }

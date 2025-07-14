@@ -70,6 +70,7 @@ fun oneShotCompress(
       compressor.setParameter(ZSTD_c_checksumFlag, it).checkError()
     }
 
+    val outputArray = ByteArray(outputArraySize)
     val inputArray = ByteArray(original.size + inputOffset + inputPadding)
     original.copyInto(0, inputArray, inputOffset, original.size)
 
@@ -79,14 +80,22 @@ fun oneShotCompress(
     input.end = inputOffset + original.size
 
     val output = UnsafeCursor()
-    output.data = ByteArray(outputArraySize)
+    output.data = outputArray
     output.start = outputOffset
     output.end = outputArraySize
 
-    val remaining = compressor.compressStream2(output, input, ZSTD_e_end).checkError()
+    val remaining = compressor.compressStream2(
+      outputByteArray = outputArray,
+      outputEnd = outputArraySize,
+      outputStart = outputOffset,
+      inputByteArray = inputArray,
+      inputEnd = inputOffset + original.size,
+      inputStart = inputOffset,
+      mode = ZSTD_e_end,
+    ).checkError()
     assertThat(remaining).isEqualTo(0)
 
-    return output.data!!.toByteString(outputOffset, compressor.outputBytesProcessed)
+    return outputArray.toByteString(outputOffset, compressor.outputBytesProcessed)
   }
 }
 
@@ -98,22 +107,20 @@ fun oneShotDecompress(
   outputArraySize: Int = 1024,
 ): ByteString {
   zstdDecompressor().use { decompressor ->
+    val outputArray = ByteArray(outputArraySize)
     val inputArray = ByteArray(compressed.size + inputOffset + inputPadding)
     compressed.copyInto(0, inputArray, inputOffset, compressed.size)
 
-    val input = UnsafeCursor()
-    input.data = inputArray
-    input.start = inputOffset
-    input.end = inputOffset + compressed.size
-
-    val output = UnsafeCursor()
-    output.data = ByteArray(outputArraySize)
-    output.start = outputOffset
-    output.end = outputArraySize
-
-    val remaining = decompressor.decompressStream(output, input).checkError()
+    val remaining = decompressor.decompressStream(
+      outputByteArray = outputArray,
+      outputEnd = outputArraySize,
+      outputStart = outputOffset,
+      inputByteArray = inputArray,
+      inputEnd = inputOffset + compressed.size,
+      inputStart = inputOffset,
+    ).checkError()
     assertThat(remaining).isEqualTo(0)
 
-    return output.data!!.toByteString(outputOffset, decompressor.outputBytesProcessed)
+    return outputArray.toByteString(outputOffset, decompressor.outputBytesProcessed)
   }
 }

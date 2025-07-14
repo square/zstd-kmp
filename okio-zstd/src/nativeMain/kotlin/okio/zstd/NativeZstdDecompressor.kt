@@ -23,7 +23,6 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
-import okio.Buffer.UnsafeCursor
 import okio.zstd.internal.ZSTD_createDCtx
 import okio.zstd.internal.ZSTD_decompressStream
 import okio.zstd.internal.ZSTD_freeDCtx
@@ -37,21 +36,25 @@ internal class NativeZstdDecompressor : ZstdDecompressor() {
     }
 
   override fun decompressStream(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
   ): Long {
     memScoped {
-      output.data!!.usePinned { outputDataPinned ->
-        input.data!!.usePinned { inputDataPinned ->
-          val outputStart = output.start.toULong()
-          val outputEnd = output.end.toULong()
+      outputByteArray.usePinned { outputDataPinned ->
+        inputByteArray.usePinned { inputDataPinned ->
+          val outputStart = outputStart.toULong()
+          val outputEnd = outputEnd.toULong()
           val zstdOutput = alloc<ZSTD_outBuffer>()
           zstdOutput.dst = outputDataPinned.addressOf(0)
           zstdOutput.pos = outputStart
           zstdOutput.size = outputEnd
 
-          val inputStart = input.start.toULong()
-          val inputEnd = input.end.toULong()
+          val inputStart = inputStart.toULong()
+          val inputEnd = inputEnd.toULong()
           val zstdInput = alloc<ZSTD_inBuffer>()
           zstdInput.src = inputDataPinned.addressOf(0)
           zstdInput.pos = inputStart

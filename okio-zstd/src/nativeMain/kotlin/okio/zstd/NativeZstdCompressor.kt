@@ -23,7 +23,6 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
-import okio.Buffer.UnsafeCursor
 import okio.zstd.internal.ZSTD_CCtx_setParameter
 import okio.zstd.internal.ZSTD_compressStream2
 import okio.zstd.internal.ZSTD_createCCtx
@@ -40,15 +39,19 @@ internal class NativeZstdCompressor : ZstdCompressor() {
   override fun setParameter(param: Int, value: Int): Long = ZSTD_CCtx_setParameter(cctx, param.toUInt(), value).toLong()
 
   override fun compressStream2(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
     mode: Int,
   ): Long {
     memScoped {
-      output.data!!.usePinned { outputDataPinned ->
-        input.data!!.usePinned { inputDataPinned ->
-          val outputStart = output.start.toULong()
-          val outputEnd = output.end.toULong()
+      outputByteArray.usePinned { outputDataPinned ->
+        inputByteArray.usePinned { inputDataPinned ->
+          val outputStart = outputStart.toULong()
+          val outputEnd = outputEnd.toULong()
           val zstdOutput = alloc<ZSTD_outBuffer>()
           zstdOutput.dst = when {
             outputStart < outputEnd -> outputDataPinned.addressOf(0)
@@ -57,8 +60,8 @@ internal class NativeZstdCompressor : ZstdCompressor() {
           zstdOutput.pos = outputStart
           zstdOutput.size = outputEnd
 
-          val inputStart = input.start.toULong()
-          val inputEnd = input.end.toULong()
+          val inputStart = inputStart.toULong()
+          val inputEnd = inputEnd.toULong()
           val zstdInput = alloc<ZSTD_inBuffer>()
           zstdInput.src = when {
             inputStart < inputEnd -> inputDataPinned.addressOf(0)

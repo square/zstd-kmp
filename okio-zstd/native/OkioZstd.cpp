@@ -23,22 +23,16 @@
  */
 class JniZstd {
 public:
-  JniZstd(JNIEnv *env, jclass unsafeCursorClass, jclass zstdCompressorClass, jclass zstdDecompressorClass);
+  JniZstd(JNIEnv *env, jclass zstdCompressorClass, jclass zstdDecompressorClass);
 
-  jfieldID unsafeCursorData;
-  jfieldID unsafeCursorStart;
-  jfieldID unsafeCursorEnd;
   jfieldID zstdCompressorOutputBytesProcessed;
   jfieldID zstdCompressorInputBytesProcessed;
   jfieldID zstdDecompressorOutputBytesProcessed;
   jfieldID zstdDecompressorInputBytesProcessed;
 };
 
-JniZstd::JniZstd(JNIEnv *env, jclass unsafeCursorClass, jclass zstdCompressorClass, jclass zstdDecompressorClass)
-  : unsafeCursorData(env->GetFieldID(unsafeCursorClass, "data", "[B")),
-    unsafeCursorStart(env->GetFieldID(unsafeCursorClass, "start", "I")),
-    unsafeCursorEnd(env->GetFieldID(unsafeCursorClass, "end", "I")),
-    zstdCompressorOutputBytesProcessed(env->GetFieldID(zstdCompressorClass, "outputBytesProcessed", "I")),
+JniZstd::JniZstd(JNIEnv *env, jclass zstdCompressorClass, jclass zstdDecompressorClass)
+  : zstdCompressorOutputBytesProcessed(env->GetFieldID(zstdCompressorClass, "outputBytesProcessed", "I")),
     zstdCompressorInputBytesProcessed(env->GetFieldID(zstdCompressorClass, "inputBytesProcessed", "I")),
     zstdDecompressorOutputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "outputBytesProcessed", "I")),
     zstdDecompressorInputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "inputBytesProcessed", "I")) {
@@ -54,10 +48,9 @@ Java_okio_zstd_JniZstd_getErrorName(JNIEnv* env, jobject type, jlong code) {
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_okio_zstd_JniZstd_createJniZstd(JNIEnv* env, jclass type) {
-  auto unsafeCursorClass = env->FindClass("okio/Buffer$UnsafeCursor");
   auto zstdCompressorClass = env->FindClass("okio/zstd/ZstdCompressor");
   auto zstdDecompressorClass = env->FindClass("okio/zstd/ZstdDecompressor");
-  auto jniZstd = new JniZstd(env, unsafeCursorClass, zstdCompressorClass, zstdDecompressorClass);
+  auto jniZstd = new JniZstd(env, zstdCompressorClass, zstdDecompressorClass);
   return reinterpret_cast<jlong>(jniZstd);
 }
 
@@ -74,21 +67,15 @@ Java_okio_zstd_JniZstdCompressor_setParameter(JNIEnv* env, jobject type, jlong c
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_okio_zstd_JniZstdCompressor_compressStream2(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong cctxPointer, jobject output, jobject input, jint mode) {
+Java_okio_zstd_JniZstdCompressor_compressStream2(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong cctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart, jint mode) {
   auto jniZstd = reinterpret_cast<JniZstd*>(jniZstdPointer);
   auto cctx = reinterpret_cast<ZSTD_CCtx*>(cctxPointer);
 
-  auto inputByteArray = static_cast<jbyteArray>(env->GetObjectField(input, jniZstd->unsafeCursorData));
   auto inputByteArrayElements = env->GetByteArrayElements(inputByteArray, NULL);
-  auto inputEnd = static_cast<size_t>(env->GetIntField(input, jniZstd->unsafeCursorEnd));
-  auto inputStart = static_cast<size_t>(env->GetIntField(input, jniZstd->unsafeCursorStart));
-  ZSTD_inBuffer zstdInput = { inputByteArrayElements, inputEnd, inputStart };
+  ZSTD_inBuffer zstdInput = { inputByteArrayElements, static_cast<size_t>(inputEnd), static_cast<size_t>(inputStart) };
 
-  auto outputByteArray = static_cast<jbyteArray>(env->GetObjectField(output, jniZstd->unsafeCursorData));
   auto outputByteArrayElements = env->GetByteArrayElements(outputByteArray, NULL);
-  auto outputEnd = static_cast<size_t>(env->GetIntField(output, jniZstd->unsafeCursorEnd));
-  auto outputStart = static_cast<size_t>(env->GetIntField(output, jniZstd->unsafeCursorStart));
-  ZSTD_outBuffer zstdOutput = { outputByteArrayElements, outputEnd, outputStart };
+  ZSTD_outBuffer zstdOutput = { outputByteArrayElements, static_cast<size_t>(outputEnd), static_cast<size_t>(outputStart) };
 
   size_t result;
   if (inputByteArrayElements != NULL && outputByteArrayElements != NULL) {
@@ -120,21 +107,15 @@ Java_okio_zstd_JniZstd_createZstdDecompressor(JNIEnv* env, jclass type) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_okio_zstd_JniZstdDecompressor_decompressStream(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong dctxPointer, jobject output, jobject input) {
+Java_okio_zstd_JniZstdDecompressor_decompressStream(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong dctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart) {
   auto jniZstd = reinterpret_cast<JniZstd*>(jniZstdPointer);
   auto dctx = reinterpret_cast<ZSTD_DCtx*>(dctxPointer);
 
-  auto inputByteArray = static_cast<jbyteArray>(env->GetObjectField(input, jniZstd->unsafeCursorData));
   auto inputByteArrayElements = env->GetByteArrayElements(inputByteArray, NULL);
-  auto inputEnd = static_cast<size_t>(env->GetIntField(input, jniZstd->unsafeCursorEnd));
-  auto inputStart = static_cast<size_t>(env->GetIntField(input, jniZstd->unsafeCursorStart));
-  ZSTD_inBuffer zstdInput = { inputByteArrayElements, inputEnd, inputStart };
+  ZSTD_inBuffer zstdInput = { inputByteArrayElements, static_cast<size_t>(inputEnd), static_cast<size_t>(inputStart) };
 
-  auto outputByteArray = static_cast<jbyteArray>(env->GetObjectField(output, jniZstd->unsafeCursorData));
   auto outputByteArrayElements = env->GetByteArrayElements(outputByteArray, NULL);
-  auto outputEnd = static_cast<size_t>(env->GetIntField(output, jniZstd->unsafeCursorEnd));
-  auto outputStart = static_cast<size_t>(env->GetIntField(output, jniZstd->unsafeCursorStart));
-  ZSTD_outBuffer zstdOutput = { outputByteArrayElements, outputEnd, outputStart };
+  ZSTD_outBuffer zstdOutput = { outputByteArrayElements, static_cast<size_t>(outputEnd), static_cast<size_t>(outputStart) };
 
   size_t result;
   if (inputByteArrayElements != NULL && outputByteArrayElements != NULL) {
