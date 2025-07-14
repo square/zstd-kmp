@@ -113,6 +113,7 @@ cklib {
     compilerArgs.addAll(
       listOf(
         //"-DDUMP_LEAKS=1", // For local testing ONLY!
+        "-DZSTD_DISABLE_ASM=1", // We haven't hooked up X86 assembly in Kotlin/Native builds.
         "-DKONAN_MI_MALLOC=1",
         "-Wno-unknown-pragmas",
         "-ftls-model=initial-exec",
