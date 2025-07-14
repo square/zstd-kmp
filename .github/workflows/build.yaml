@@ -27,7 +27,7 @@ jobs:
           - os: macos-latest
             arch: aarch64
             native-test-tasks: "macosArm64Test iosSimulatorArm64Test"
-          # TODO: build on 'windows-latest'
+        # TODO: build on 'windows-latest'
 
     runs-on: ${{ matrix.os }}
 
