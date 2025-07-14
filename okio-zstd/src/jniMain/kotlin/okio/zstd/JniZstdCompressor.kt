@@ -15,8 +15,6 @@
  */
 package okio.zstd
 
-import okio.Buffer.UnsafeCursor
-
 internal class JniZstdCompressor : ZstdCompressor() {
   @JvmField
   var cctxPointer = createZstdCompressor()
@@ -27,10 +25,24 @@ internal class JniZstdCompressor : ZstdCompressor() {
   override fun setParameter(param: Int, value: Int): Long = setParameter(cctxPointer, param, value)
 
   override fun compressStream2(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
     mode: Int,
-  ): Long = compressStream2(jniZstdPointer, cctxPointer, output, input, mode)
+  ): Long = compressStream2(
+    jniPointer = jniZstdPointer,
+    cctxPointer = cctxPointer,
+    outputByteArray = outputByteArray,
+    outputEnd = outputEnd,
+    outputStart = outputStart,
+    inputByteArray = inputByteArray,
+    inputEnd = inputEnd,
+    inputStart = inputStart,
+    mode = mode,
+  )
 
   override fun close() {
     val cctxPointerToClose = cctxPointer
@@ -45,8 +57,12 @@ internal class JniZstdCompressor : ZstdCompressor() {
   private external fun compressStream2(
     jniPointer: Long,
     cctxPointer: Long,
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
     mode: Int,
   ): Long
 

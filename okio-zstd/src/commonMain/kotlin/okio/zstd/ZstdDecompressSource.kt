@@ -87,7 +87,14 @@ internal class ZstdDecompressSource internal constructor(
 
         source.buffer.readUnsafe(inputCursor).use { inputCursor ->
           inputCursor.next()
-          result = decompressor.decompressStream(outputCursor, inputCursor)
+          result = decompressor.decompressStream(
+            outputByteArray = outputCursor.data!!,
+            outputEnd = outputCursor.end,
+            outputStart = outputCursor.start,
+            inputByteArray = inputCursor.data!!,
+            inputEnd = inputCursor.end,
+            inputStart = inputCursor.start,
+          )
         }
         source.skip(decompressor.inputBytesProcessed.toLong())
 

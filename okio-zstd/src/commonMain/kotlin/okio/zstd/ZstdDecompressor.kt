@@ -16,7 +16,6 @@
 package okio.zstd
 
 import kotlin.jvm.JvmField
-import okio.Buffer.UnsafeCursor
 import okio.Closeable
 
 internal abstract class ZstdDecompressor : Closeable {
@@ -29,7 +28,11 @@ internal abstract class ZstdDecompressor : Closeable {
   var outputBytesProcessed: Int = -1
 
   abstract fun decompressStream(
-    output: UnsafeCursor,
-    input: UnsafeCursor,
+    outputByteArray: ByteArray,
+    outputEnd: Int,
+    outputStart: Int,
+    inputByteArray: ByteArray,
+    inputEnd: Int,
+    inputStart: Int,
   ): Long
 }

@@ -99,16 +99,29 @@ internal class ZstdCompressSink internal constructor(
           // Compress some input. This might not produce any output!
           inputBuffer.readUnsafe(inputCursor).use { inputCursor ->
             inputCursor.next()
-            result = compressor.compressStream2(outputCursor, inputCursor, mode)
+            result = compressor.compressStream2(
+              outputByteArray = outputCursor.data!!,
+              outputEnd = outputCursor.end,
+              outputStart = outputCursor.start,
+              inputByteArray = inputCursor.data!!,
+              inputEnd = inputCursor.end,
+              inputStart = inputCursor.start,
+              mode = mode,
+            )
           }
           inputRemaining -= compressor.inputBytesProcessed
           inputBuffer.skip(compressor.inputBytesProcessed.toLong())
         } else {
           // No more input, but possibly more output.
-          inputCursor.data = emptyByteArray
-          inputCursor.start = 0
-          inputCursor.end = 0
-          result = compressor.compressStream2(outputCursor, inputCursor, mode)
+          result = compressor.compressStream2(
+            outputByteArray = outputCursor.data!!,
+            outputEnd = outputCursor.end,
+            outputStart = outputCursor.start,
+            inputByteArray = emptyByteArray,
+            inputEnd = 0,
+            inputStart = 0,
+            mode = mode,
+          )
         }
 
         outputCursor.resizeBuffer(outputSizeBefore + compressor.outputBytesProcessed)
