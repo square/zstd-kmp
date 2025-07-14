@@ -58,22 +58,18 @@ kotlin {
         implementation(kotlin("test"))
       }
     }
-    val jniTest by creating {
-      dependsOn(commonTest)
-    }
     val jvmTest by getting {
       // The jniTest directory depends on different lubenZstdJni artifacts for JVM vs. Android.
-      // That library isn't Kotlin Multiplatform and doesn't have a common artifact, which makes for
-      // a bad IDE experience. This redundant line makes the IDE experience better.
+      // That library isn't Kotlin Multiplatform and doesn't have a common artifact. Including it as
+      // a srcDir instead of as a sourceSet makes the IDE experience better.
       kotlin.srcDir("src/jniTest/kotlin")
-
-      dependsOn(jniTest)
       dependencies {
         implementation(libs.lubenZstdJni)
       }
     }
     val androidInstrumentedTest by getting {
-      dependsOn(jniTest)
+      dependsOn(commonTest)
+      kotlin.srcDir("src/jniTest/kotlin")
     }
 
     targets.withType<KotlinNativeTarget> {
