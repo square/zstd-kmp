@@ -53,7 +53,7 @@ jobs:
         run: ./gradlew jvmTest
 
       - name: Kotlin/Native test
-        run: ./gradlew ${{ matrix.platform.native-test-tasks }}
+        run: ./gradlew ${{ matrix.native-test-tasks }}
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
         with:
@@ -69,7 +69,7 @@ jobs:
           retention-days: 1
 
   check:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs:
       - platform-build
 
