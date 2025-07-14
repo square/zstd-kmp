@@ -126,7 +126,7 @@ cklib {
 }
 
 android {
-  namespace = "app.cash.zipline"
+  namespace = "okio.zstd"
   compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {

@@ -13,37 +13,65 @@ env:
   GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 
 jobs:
-  zig:
-    runs-on: macos-latest
+  platform-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        arch: [amd64]
+        native-test-tasks: ["linuxX64Test"]
+        include:
+          - os: macos-latest-large
+            arch: x86_64
+            native-test-tasks: "macosX64Test iosX64Test"
+          - os: macos-latest
+            arch: aarch64
+            native-test-tasks: "macosArm64Test iosSimulatorArm64Test"
+          # TODO: build on 'windows-latest'
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
         with:
           submodules: true
 
-      - uses: mlugg/setup-zig@475c97be87a204e6c57fe851f970bd02005a70f0 # ratchet:mlugg/setup-zig@v2
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # ratchet:actions/setup-java@v4
         with:
-          version: 0.14.0
+          distribution: 'zulu'
+          java-version-file: .github/workflows/.java-version
 
-      - run: zig build -p src/jvmMain/resources/jni
-        working-directory: okio-zstd
+      - name: Build JNI library (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: ./okio-zstd/src/jvmMain/build-linux.sh
+
+      - name: Build JNI library (macOS)
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-large'
+        run: ./okio-zstd/src/jvmMain/build-mac.sh
+
+      - name: Kotlin/JVM test
+        run: ./gradlew jvmTest
+
+      - name: Kotlin/Native test
+        run: ./gradlew ${{ matrix.platform.native-test-tasks }}
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
         with:
-          name: jni-binaries
-          path: okio-zstd/src/jvmMain/resources/jni
+          name: jvm-native-libraries-${{ matrix.os }}-${{ matrix.arch }}
+          path: okio-zstd/src/jvmMain/resources/*
           if-no-files-found: error
 
-  platform-tests:
-    needs:
-      - zig
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - os: macos-latest
-            task: macosArm64Test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: test-report-${{ matrix.os }}
+          path: '**/build/reports/tests/**'
+          retention-days: 1
 
-    runs-on: ${{ matrix.platform.os }}
+  check:
+    runs-on: macos-latest
+    needs:
+      - platform-build
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
@@ -56,71 +84,25 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
-          name: jni-binaries
-          path: okio-zstd/src/jvmMain/resources/jni
+          pattern: jvm-native-libraries-*
+          path: okio-zstd/src/jvmMain/resources
+          merge-multiple: true
 
-      - run: ./gradlew jvmTest ${{ matrix.platform.task }} apiCheck --stacktrace
+      - name: Run checks
+        run: ./gradlew apiCheck spotlessCheck assembleAndroidTest
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: test-report-${{ matrix.platform.os }}
-          path: '**/build/reports/tests/**'
-          retention-days: 1
-
-  android-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # ratchet:actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version-file: .github/workflows/.java-version
-
-      - name: Enable KVM
+      - name: Enable KVM (for Android test)
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - run: ./gradlew assembleAndroidTest
-
-      - uses: reactivecircus/android-emulator-runner@1dcd0090116d15e7c562f8db72807de5e036a4ed # ratchet:reactivecircus/android-emulator-runner@v2
+      - name: Android test
+        uses: reactivecircus/android-emulator-runner@1dcd0090116d15e7c562f8db72807de5e036a4ed # ratchet:reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           emulator-boot-timeout: 20000
           script: ./gradlew connectedCheck
-
-  build:
-    runs-on: macos-latest
-    needs:
-      - platform-tests
-      - android-tests
-
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # ratchet:actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version-file: .github/workflows/.java-version
-
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
-        with:
-          name: jni-binaries
-          path: okio-zstd/src/jvmMain/resources/jni
-
-      - run: ./gradlew assemble :dokkaHtmlMultiModule
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
-        with:
-          name: html-docs
-          path: build/dokka/htmlMultiModule/
-          if-no-files-found: error
 
       - run: ./gradlew publishToMavenCentral
         if: ${{ github.ref == 'refs/heads/main' && github.repository == 'square/okio-zstd' }}
@@ -129,13 +111,3 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SECRET_PASSPHRASE }}
-
-      - name: Deploy docs to website
-        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'square/okio-zstd' }}
-        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505 # ratchet:JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: site
-          FOLDER: build/dokka/htmlMultiModule/
-          TARGET_FOLDER: docs/latest/
-          CLEAN: true
