@@ -37,8 +37,7 @@ internal class NativeZstdCompressor : ZstdCompressor() {
       if (it == null) throw OutOfMemoryError("ZSTD_createCCtx failed")
     }
 
-  override fun setParameter(param: Int, value: Int): Long =
-    ZSTD_CCtx_setParameter(cctx, param.toUInt(), value).toLong()
+  override fun setParameter(param: Int, value: Int): Long = ZSTD_CCtx_setParameter(cctx, param.toUInt(), value).toLong()
 
   override fun compressStream2(
     output: UnsafeCursor,
