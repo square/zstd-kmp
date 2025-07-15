@@ -1,4 +1,4 @@
-rootProject.name = "okio-zstd-root"
+rootProject.name = "zstd-kmp-root"
 
 include(":zstd-kmp")
 

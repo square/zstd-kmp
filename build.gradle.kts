@@ -53,7 +53,7 @@ configure<SpotlessExtension> {
 }
 
 allprojects {
-  group = "com.squareup.okio-zstd"
+  group = "com.squareup.zstd"
   version = project.property("VERSION_NAME") as String
 
   repositories {
@@ -74,7 +74,7 @@ subprojects {
 }
 
 tasks.named("dokkaHtmlMultiModule", DokkaMultiModuleTask::class.java).configure {
-  moduleName.set("Okio-Zstd")
+  moduleName.set("Zstd-Kmp")
 }
 
 allprojects {
@@ -160,7 +160,7 @@ allprojects {
       publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
       signAllPublications()
       pom {
-        description.set("ZStandard for Okio")
+        description.set("ZStandard for Kotlin Multiplatform")
         name.set(project.name)
         url.set("https://github.com/square/okio-zstd/")
         licenses {

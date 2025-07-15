@@ -1,6 +1,9 @@
-# Okio Zstd
+# Zstd-KMP
 
-Build the native libraries:
+The [ZStandard compression library (zstd)][zstd], packaged for [Kotlin multiplatform (kmp)][kmp].
+
+
+## Building
 
 # Git Submodules
 
@@ -15,13 +18,13 @@ git submodule update
 brew install cmake
 ```
 
-# macOS
+# Build JNI libraries on macOS
 
 ```
 ./zstd-kmp/src/jvmMain/build-mac.sh
 ```
 
-# Linux
+# Build JNI libraries on Linux
 
 ```
 ./zstd-kmp/src/jvmMain/build-linux.sh
@@ -32,3 +35,6 @@ brew install cmake
 ```
 ./gradlew zstd-kmp:jvmTest
 ```
+
+[kmp]: https://kotlinlang.org/docs/multiplatform.html
+[zstd]: https://github.com/facebook/zstd

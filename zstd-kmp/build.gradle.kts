@@ -78,7 +78,7 @@ kotlin {
       main.cinterops {
         create("zstd") {
           header(file("../zstd/lib/zstd.h"))
-          packageName("okio.zstd.internal")
+          packageName("com.squareup.zstd.internal")
         }
       }
     }
@@ -127,7 +127,7 @@ cklib {
 }
 
 android {
-  namespace = "okio.zstd"
+  namespace = "com.squareup.zstd"
   compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {
