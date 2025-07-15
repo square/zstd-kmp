@@ -28,5 +28,5 @@ docs/0.x
 zig-out
 
 # Binaries
-okio-zstd/src/jvmMain/resources/jni/**/*.dylib
-okio-zstd/src/jvmMain/resources/jni/**/*.so
+zstd-kmp/src/jvmMain/resources/jni/**/*.dylib
+zstd-kmp/src/jvmMain/resources/jni/**/*.so

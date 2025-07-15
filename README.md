@@ -18,17 +18,17 @@ brew install cmake
 # macOS
 
 ```
-./okio-zstd/src/jvmMain/build-mac.sh
+./zstd-kmp/src/jvmMain/build-mac.sh
 ```
 
 # Linux
 
 ```
-./okio-zstd/src/jvmMain/build-linux.sh
+./zstd-kmp/src/jvmMain/build-linux.sh
 ```
 
 # Test it:
 
 ```
-./gradlew okio-zstd:jvmTest
+./gradlew zstd-kmp:jvmTest
 ```

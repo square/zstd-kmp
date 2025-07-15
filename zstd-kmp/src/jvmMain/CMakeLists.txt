@@ -7,7 +7,7 @@ set(ZSTD_BUILD_SHARED OFF)
 
 add_subdirectory("../../../zstd/build/cmake" "zstd")
 
-project(okio-zstd)
+project(zstd-kmp)
 
 set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_AWT_INCLUDE_PATH NotNeeded)
@@ -16,8 +16,8 @@ include_directories(${JNI_INCLUDE_DIRS})
 
 file(GLOB_RECURSE sources "../../native/*.cpp")
 
-add_library(okio-zstd SHARED ${sources})
+add_library(zstd-kmp SHARED ${sources})
 
-target_include_directories(okio-zstd PRIVATE "../../../zstd/lib")
+target_include_directories(zstd-kmp PRIVATE "../../../zstd/lib")
 
-target_link_libraries(okio-zstd libzstd_static)
+target_link_libraries(zstd-kmp libzstd_static)
