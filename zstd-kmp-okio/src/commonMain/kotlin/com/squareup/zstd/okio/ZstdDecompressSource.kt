@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.zstd
+package com.squareup.zstd.okio
 
+import com.squareup.zstd.ZstdDecompressor
 import kotlin.jvm.JvmField
 import okio.Buffer
 import okio.Buffer.UnsafeCursor

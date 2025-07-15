@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.zstd
+package com.squareup.zstd.okio
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -22,7 +22,6 @@ import kotlin.test.Test
 import okio.Buffer
 import okio.ByteString
 import okio.ByteString.Companion.encodeUtf8
-import okio.ByteString.Companion.toByteString
 import okio.buffer
 
 /**
@@ -37,7 +36,7 @@ internal class LubenZstdJniInteropTest {
   fun lubenCompressKmpDecompress() {
     val original = "hello world".encodeUtf8()
     val compressed = LubenZstd.compress(original.toByteArray())
-    val decompressed = oneShotDecompress(compressed.toByteString())
+    val decompressed = decompress(compressed)
     assertThat(decompressed).isEqualTo(original)
   }
 
@@ -47,6 +46,14 @@ internal class LubenZstdJniInteropTest {
     val compressed = compress(original)
     val decompressed = compressed.referenceDecompress()
     assertThat(decompressed).isEqualTo(original)
+  }
+
+  private fun decompress(compressed: ByteArray): ByteString {
+    val buffer = Buffer()
+    buffer.write(compressed)
+    return buffer.zstdDecompress().buffer().use {
+      it.readByteString()
+    }
   }
 
   private fun compress(original: ByteString): Buffer {

@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("ktlint:standard:property-naming")
 @file:JvmMultifileClass
 @file:JvmName("Zstd")
 
 package com.squareup.zstd
 
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
+actual fun getErrorName(code: Long): String? = jniGetErrorName(code)
 
-// From ZSTD_EndDirective in zstd.h.
-const val ZSTD_e_continue = 0
-const val ZSTD_e_flush = 1
-const val ZSTD_e_end = 2
+actual fun zstdCompressor(): ZstdCompressor = JniZstdCompressor()
 
-expect fun getErrorName(code: Long): String?
-
-/** Returns a new compressor. The caller must close it. */
-expect fun zstdCompressor(): ZstdCompressor
-
-/** Returns a new decompressor. The caller must close it. */
-expect fun zstdDecompressor(): ZstdDecompressor
+actual fun zstdDecompressor(): ZstdDecompressor = JniZstdDecompressor()

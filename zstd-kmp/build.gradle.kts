@@ -10,7 +10,6 @@ plugins {
   id("org.jetbrains.dokka")
   id("com.vanniktech.maven.publish.base")
   id("co.touchlab.cklib")
-  id("com.github.gmazzo.buildconfig")
   id("binary-compatibility-validator")
 }
 
@@ -35,41 +34,15 @@ kotlin {
 
   sourceSets {
     val commonMain by getting {
-      dependencies {
-        api(libs.okio.core)
-      }
     }
     val jniMain by creating {
       dependsOn(commonMain)
-      dependencies {
-        api(libs.okio.core)
-      }
     }
     val jvmMain by getting {
       dependsOn(jniMain)
     }
     val androidMain by getting {
       dependsOn(jniMain)
-    }
-
-    val commonTest by getting {
-      dependencies {
-        implementation(libs.assertk)
-        implementation(kotlin("test"))
-      }
-    }
-    val jvmTest by getting {
-      // The jniTest directory depends on different lubenZstdJni artifacts for JVM vs. Android.
-      // That library isn't Kotlin Multiplatform and doesn't have a common artifact. Including it as
-      // a srcDir instead of as a sourceSet makes the IDE experience better.
-      kotlin.srcDir("src/jniTest/kotlin")
-      dependencies {
-        implementation(libs.lubenZstdJni)
-      }
-    }
-    val androidInstrumentedTest by getting {
-      dependsOn(commonTest)
-      kotlin.srcDir("src/jniTest/kotlin")
     }
 
     targets.withType<KotlinNativeTarget> {
@@ -82,22 +55,14 @@ kotlin {
         }
       }
     }
-  }
-}
 
-dependencies {
-  androidTestImplementation(libs.androidx.test.runner)
-  androidTestImplementation(
-    variantOf(libs.lubenZstdJni) {
-      artifactType("aar")
+    val commonTest by getting {
+      dependencies {
+        api(kotlin("test"))
+        api(libs.assertk)
+        api(libs.okio.core)
+      }
     }
-  )
-}
-
-buildConfig {
-  useKotlinOutput {
-    internalVisibility = true
-    topLevelConstants = true
   }
 }
 

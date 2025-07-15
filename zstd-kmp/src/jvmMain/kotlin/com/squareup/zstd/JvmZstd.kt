@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:JvmName("JvmZstd")
+@file:JvmMultifileClass
+@file:JvmName("Zstd")
 
 package com.squareup.zstd
 
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.Locale.US
-import okio.FileSystem
-import okio.Path.Companion.toOkioPath
-import okio.Path.Companion.toPath
 
 @Suppress("UnsafeDynamicallyLoadedCode") // Only loading from our own JAR contents.
 internal actual fun loadNativeLibrary() {
   val osName = System.getProperty("os.name").lowercase(US)
   val osArch = System.getProperty("os.arch").lowercase(US)
   val resourcePath = when {
-    osName.contains("linux") -> "/jni/$osArch/libzstd-kmp.so".toPath()
-    osName.contains("mac") -> "/jni/$osArch/libzstd-kmp.dylib".toPath()
+    osName.contains("linux") -> "/jni/$osArch/libzstd-kmp.so"
+    osName.contains("mac") -> "/jni/$osArch/libzstd-kmp.dylib"
     else -> error("Unsupported OS: $osName")
   }
 
@@ -37,10 +36,8 @@ internal actual fun loadNativeLibrary() {
   val tempFile = Files.createTempFile("zstd-kmp", null)
   tempFile.toFile().deleteOnExit()
 
-  FileSystem.RESOURCES.read(resourcePath) {
-    FileSystem.SYSTEM.write(tempFile.toOkioPath()) {
-      writeAll(this@read)
-    }
+  ZstdCompressor::class.java.getResourceAsStream(resourcePath).use { inputStream ->
+    Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING)
   }
 
   System.load(tempFile.toAbsolutePath().toString())

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.zstd
+package com.squareup.zstd.okio
 
 import okio.Buffer
 import okio.ByteString

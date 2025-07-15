@@ -22,11 +22,11 @@ import com.squareup.zstd.internal.ZSTD_isError
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 
-internal actual fun zstdCompressor(): ZstdCompressor = NativeZstdCompressor()
+actual fun zstdCompressor(): ZstdCompressor = NativeZstdCompressor()
 
-internal actual fun zstdDecompressor(): ZstdDecompressor = NativeZstdDecompressor()
+actual fun zstdDecompressor(): ZstdDecompressor = NativeZstdDecompressor()
 
-internal actual fun getErrorName(code: Long): String? {
+actual fun getErrorName(code: Long): String? {
   if (ZSTD_isError(code.toULong()) == 0U) return null
   return ZSTD_getErrorName(code.toULong())?.toKString()
 }
