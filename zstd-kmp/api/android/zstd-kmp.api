@@ -2,6 +2,7 @@ public final class com/squareup/zstd/Zstd {
 	public static final field ZSTD_e_continue I
 	public static final field ZSTD_e_end I
 	public static final field ZSTD_e_flush I
+	public static final fun getErrorName (J)Ljava/lang/String;
 	public static final fun zstdCompressor ()Lcom/squareup/zstd/ZstdCompressor;
 	public static final fun zstdDecompressor ()Lcom/squareup/zstd/ZstdDecompressor;
 }

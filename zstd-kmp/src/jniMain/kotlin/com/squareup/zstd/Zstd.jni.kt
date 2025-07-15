@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:JvmMultifileClass
+@file:JvmName("Zstd")
+
 package com.squareup.zstd
 
-internal val jniZstdPointer: Long = run {
-  loadNativeLibrary()
-  createJniZstd()
-}
+actual fun getErrorName(code: Long): String? = jniGetErrorName(code)
 
-@JvmName("createJniZstd")
-internal external fun createJniZstd(): Long
+actual fun zstdCompressor(): ZstdCompressor = JniZstdCompressor()
 
-@JvmName("jniGetErrorName")
-internal external fun jniGetErrorName(code: Long): String?
-
-@JvmName("createZstdCompressor")
-internal external fun createZstdCompressor(): Long
-
-@JvmName("createZstdDecompressor")
-internal external fun createZstdDecompressor(): Long
-
-internal expect fun loadNativeLibrary()
+actual fun zstdDecompressor(): ZstdDecompressor = JniZstdDecompressor()

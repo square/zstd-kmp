@@ -39,7 +39,7 @@ JniZstd::JniZstd(JNIEnv *env, jclass zstdCompressorClass, jclass zstdDecompresso
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_squareup_zstd_JniZstd_getErrorName(JNIEnv* env, jobject type, jlong code) {
+Java_com_squareup_zstd_JniZstdKt_jniGetErrorName(JNIEnv* env, jobject type, jlong code) {
   auto codeSizeT = static_cast<size_t>(code);
   if (!ZSTD_isError(codeSizeT)) return NULL;
   auto errorString = ZSTD_getErrorName(codeSizeT);
@@ -47,7 +47,7 @@ Java_com_squareup_zstd_JniZstd_getErrorName(JNIEnv* env, jobject type, jlong cod
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstd_createJniZstd(JNIEnv* env, jclass type) {
+Java_com_squareup_zstd_JniZstdKt_createJniZstd(JNIEnv* env, jclass type) {
   auto zstdCompressorClass = env->FindClass("com/squareup/zstd/ZstdCompressor");
   auto zstdDecompressorClass = env->FindClass("com/squareup/zstd/ZstdDecompressor");
   auto jniZstd = new JniZstd(env, zstdCompressorClass, zstdDecompressorClass);
@@ -55,7 +55,7 @@ Java_com_squareup_zstd_JniZstd_createJniZstd(JNIEnv* env, jclass type) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstd_createZstdCompressor(JNIEnv* env, jclass type) {
+Java_com_squareup_zstd_JniZstdKt_createZstdCompressor(JNIEnv* env, jclass type) {
   ZSTD_CCtx* cctx = ZSTD_createCCtx(); // Could be NULL.
   return reinterpret_cast<jlong>(cctx);
 }
@@ -101,7 +101,7 @@ Java_com_squareup_zstd_JniZstdCompressor_close(JNIEnv* env, jobject type, jlong 
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstd_createZstdDecompressor(JNIEnv* env, jclass type) {
+Java_com_squareup_zstd_JniZstdKt_createZstdDecompressor(JNIEnv* env, jclass type) {
   ZSTD_DCtx* dctx = ZSTD_createDCtx(); // Could be NULL.
   return reinterpret_cast<jlong>(dctx);
 }
