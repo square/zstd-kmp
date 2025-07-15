@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## Version 0.1.0
+## Version 0.2.0
 
 _2025-07-15_
 
