@@ -105,7 +105,6 @@ jobs:
           script: ./gradlew connectedCheck
 
       - run: ./gradlew publishToMavenCentral
-        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'square/zstd-kmp' }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
