@@ -19,6 +19,7 @@ import com.squareup.zstd.ZSTD_e_continue
 import com.squareup.zstd.ZSTD_e_end
 import com.squareup.zstd.ZSTD_e_flush
 import com.squareup.zstd.ZstdCompressor
+import com.squareup.zstd.getErrorName
 import kotlin.jvm.JvmField
 import okio.Buffer
 import okio.Buffer.UnsafeCursor
@@ -132,7 +133,9 @@ internal class ZstdCompressSink internal constructor(
       }
 
       sink.emitCompleteSegments()
-      result.checkError()
+      getErrorName(result)?.let { errorName ->
+        throw IOException("zstd compress failed: $errorName")
+      }
 
       val finished = when (mode) {
         ZSTD_e_continue -> inputRemaining == 0L
