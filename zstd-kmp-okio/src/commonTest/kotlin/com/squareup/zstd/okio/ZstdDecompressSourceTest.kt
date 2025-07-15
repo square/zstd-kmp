@@ -23,6 +23,11 @@ import kotlin.test.assertFailsWith
 import okio.Buffer
 import okio.ByteString
 import okio.EOFException
+import okio.FileSystem
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.SYSTEM
+import okio.Source
 import okio.buffer
 import okio.use
 
@@ -73,5 +78,40 @@ class ZstdDecompressSourceTest {
     Buffer().zstdDecompress().buffer().use {
       assertThat(it.readByteString()).isEqualTo(ByteString.EMPTY)
     }
+  }
+
+  @Test
+  fun compressReadme() {
+//    compressOneFile(FileSystem.SYSTEM, "/Volumes/Development/okio-zstd/README.md".toPath())
+    decompressOneFile(FileSystem.SYSTEM, "/Volumes/Development/okio-zstd/README-2.md.zst".toPath())
+  }
+
+  fun compressOneFile(fileSystem: FileSystem, path: Path) {
+    val zstdPath = "$path.zst".toPath()
+    fileSystem.source(path).use { fileSource ->
+      fileSystem.sink(zstdPath).zstdCompress().buffer().use { zstdSink ->
+        zstdSink.writeAll(fileSource)
+      }
+    }
+  }
+
+  fun decompressOneFile(fileSystem: FileSystem, path: Path) {
+    require(path.name.endsWith(".zst")) { "unexpected path: $path"}
+    val filePath = path.toString().removeSuffix(".zst").toPath()
+    fileSystem.source(path).zstdDecompress().use { zstdSource ->
+      fileSystem.sink(filePath).buffer().use { fileSink ->
+        fileSink.writeAll(zstdSource)
+      }
+    }
+  }
+
+  fun compress(data: Source): ByteString {
+    val result = Buffer()
+
+    result.zstdCompress().buffer().use { zstdSink ->
+      zstdSink.writeAll(data)
+    }
+
+    return result.readByteString()
   }
 }
