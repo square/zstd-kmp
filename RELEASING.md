@@ -33,4 +33,4 @@ Releasing
 
 4. Wait for [GitHub Actions][github_actions] to build and promote the release.
 
-[github_actions]: https://github.com/square/okio/actions
+[github_actions]: https://github.com/square/zstd-kmp/actions

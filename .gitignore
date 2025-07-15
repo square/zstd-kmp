@@ -20,6 +20,9 @@ jacoco.exec
 xcuserdata
 Pods
 
+# macOS
+.DS_Store
+
 # Release
 docs/0.x
 
