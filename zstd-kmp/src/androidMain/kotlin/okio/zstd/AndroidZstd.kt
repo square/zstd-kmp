@@ -16,5 +16,5 @@
 package okio.zstd
 
 internal actual fun loadNativeLibrary() {
-  System.loadLibrary("okio-zstd")
+  System.loadLibrary("zstd-kmp")
 }

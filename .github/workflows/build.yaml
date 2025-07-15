@@ -43,11 +43,11 @@ jobs:
 
       - name: Build JNI library (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: ./okio-zstd/src/jvmMain/build-linux.sh
+        run: ./zstd-kmp/src/jvmMain/build-linux.sh
 
       - name: Build JNI library (macOS)
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-large'
-        run: ./okio-zstd/src/jvmMain/build-mac.sh
+        run: ./zstd-kmp/src/jvmMain/build-mac.sh
 
       - name: Kotlin/JVM test
         run: ./gradlew jvmTest
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
         with:
           name: jvm-native-libraries-${{ matrix.os }}-${{ matrix.arch }}
-          path: okio-zstd/src/jvmMain/resources/*
+          path: zstd-kmp/src/jvmMain/resources/*
           if-no-files-found: error
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # ratchet:actions/upload-artifact@v4
@@ -85,7 +85,7 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # ratchet:actions/download-artifact@v4
         with:
           pattern: jvm-native-libraries-*
-          path: okio-zstd/src/jvmMain/resources
+          path: zstd-kmp/src/jvmMain/resources
           merge-multiple: true
 
       - name: Run checks
@@ -105,7 +105,7 @@ jobs:
           script: ./gradlew connectedCheck
 
       - run: ./gradlew publishToMavenCentral
-        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'square/okio-zstd' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'square/zstd-kmp' }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}

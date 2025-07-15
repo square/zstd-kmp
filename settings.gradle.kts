@@ -1,5 +1,5 @@
 rootProject.name = "okio-zstd-root"
 
-include(":okio-zstd")
+include(":zstd-kmp")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
