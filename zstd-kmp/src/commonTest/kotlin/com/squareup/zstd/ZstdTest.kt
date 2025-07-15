@@ -13,14 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("ktlint:standard:property-naming")
+
 package com.squareup.zstd
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import kotlin.test.Test
+import okio.Buffer.UnsafeCursor
+import okio.ByteString
 import okio.ByteString.Companion.decodeHex
 import okio.ByteString.Companion.encodeUtf8
+import okio.ByteString.Companion.toByteString
+import okio.IOException
+
+// From ZSTD_ErrorCode in zstd_errors.h. This is a small subset!
+internal const val ZSTD_error_no_error = 0L
+internal const val ZSTD_error_GENERIC = -1L
+
+// From ZSTD_cParameter in zstd.h. This is a small subset!
+internal const val ZSTD_c_compressionLevel = 100
+internal const val ZSTD_c_checksumFlag = 201
 
 /**
  * Exercise the native bindings.
@@ -94,4 +108,87 @@ internal class ZstdTest {
       ),
     ).isEqualTo(helloWorld)
   }
+}
+
+fun oneShotCompress(
+  original: ByteString,
+  inputOffset: Int = 0,
+  inputPadding: Int = 0,
+  outputOffset: Int = 0,
+  compressionLevel: Int? = null,
+  checksumFlag: Int? = null,
+  outputArraySize: Int = 1024,
+): ByteString {
+  val compressor = zstdCompressor()
+  try {
+    compressionLevel?.let {
+      compressor.setParameter(ZSTD_c_compressionLevel, it).checkError()
+    }
+    checksumFlag?.let {
+      compressor.setParameter(ZSTD_c_checksumFlag, it).checkError()
+    }
+
+    val outputArray = ByteArray(outputArraySize)
+    val inputArray = ByteArray(original.size + inputOffset + inputPadding)
+    original.copyInto(0, inputArray, inputOffset, original.size)
+
+    val input = UnsafeCursor()
+    input.data = inputArray
+    input.start = inputOffset
+    input.end = inputOffset + original.size
+
+    val output = UnsafeCursor()
+    output.data = outputArray
+    output.start = outputOffset
+    output.end = outputArraySize
+
+    val remaining = compressor.compressStream2(
+      outputByteArray = outputArray,
+      outputEnd = outputArraySize,
+      outputStart = outputOffset,
+      inputByteArray = inputArray,
+      inputEnd = inputOffset + original.size,
+      inputStart = inputOffset,
+      mode = ZSTD_e_end,
+    ).checkError()
+    assertThat(remaining).isEqualTo(0)
+
+    return outputArray.toByteString(outputOffset, compressor.outputBytesProcessed)
+  } finally {
+    compressor.close()
+  }
+}
+
+fun oneShotDecompress(
+  compressed: ByteString,
+  inputOffset: Int = 0,
+  inputPadding: Int = 0,
+  outputOffset: Int = 0,
+  outputArraySize: Int = 1024,
+): ByteString {
+  val decompressor = zstdDecompressor()
+  try {
+    val outputArray = ByteArray(outputArraySize)
+    val inputArray = ByteArray(compressed.size + inputOffset + inputPadding)
+    compressed.copyInto(0, inputArray, inputOffset, compressed.size)
+
+    val remaining = decompressor.decompressStream(
+      outputByteArray = outputArray,
+      outputEnd = outputArraySize,
+      outputStart = outputOffset,
+      inputByteArray = inputArray,
+      inputEnd = inputOffset + compressed.size,
+      inputStart = inputOffset,
+    ).checkError()
+    assertThat(remaining).isEqualTo(0)
+
+    return outputArray.toByteString(outputOffset, decompressor.outputBytesProcessed)
+  } finally {
+    decompressor.close()
+  }
+}
+
+internal fun Long.checkError(): Long {
+  val errorName = getErrorName(this) ?: return this
+  throw IOException(errorName)
 }

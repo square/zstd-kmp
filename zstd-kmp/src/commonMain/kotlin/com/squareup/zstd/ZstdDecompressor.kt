@@ -16,9 +16,8 @@
 package com.squareup.zstd
 
 import kotlin.jvm.JvmField
-import okio.Closeable
 
-internal abstract class ZstdDecompressor : Closeable {
+abstract class ZstdDecompressor : AutoCloseable {
   /** The number of bytes consumed on the most recent call to [decompressStream]. */
   @JvmField
   var inputBytesProcessed: Int = -1

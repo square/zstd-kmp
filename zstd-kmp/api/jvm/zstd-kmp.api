@@ -1,5 +1,23 @@
 public final class com/squareup/zstd/Zstd {
-	public static final fun zstdCompress (Lokio/Sink;)Lokio/Sink;
-	public static final fun zstdDecompress (Lokio/Source;)Lokio/Source;
+	public static final field ZSTD_e_continue I
+	public static final field ZSTD_e_end I
+	public static final field ZSTD_e_flush I
+	public static final fun zstdCompressor ()Lcom/squareup/zstd/ZstdCompressor;
+	public static final fun zstdDecompressor ()Lcom/squareup/zstd/ZstdDecompressor;
+}
+
+public abstract class com/squareup/zstd/ZstdCompressor : java/lang/AutoCloseable {
+	public field inputBytesProcessed I
+	public field outputBytesProcessed I
+	public fun <init> ()V
+	public abstract fun compressStream2 ([BII[BIII)J
+	public abstract fun setParameter (II)J
+}
+
+public abstract class com/squareup/zstd/ZstdDecompressor : java/lang/AutoCloseable {
+	public field inputBytesProcessed I
+	public field outputBytesProcessed I
+	public fun <init> ()V
+	public abstract fun decompressStream ([BII[BII)J
 }
 

@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.squareup.zstd
+@file:Suppress(
+  "CANNOT_OVERRIDE_INVISIBLE_MEMBER",
+  "INVISIBLE_MEMBER",
+  "INVISIBLE_REFERENCE",
+)
+
+package com.squareup.zstd.okio
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
@@ -21,6 +27,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isTrue
 import com.github.luben.zstd.ZstdInputStream
+import com.squareup.zstd.JniZstdCompressor
 import java.io.InterruptedIOException
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random

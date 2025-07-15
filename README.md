@@ -33,7 +33,11 @@ brew install cmake
 # Test it:
 
 ```
-./gradlew zstd-kmp:jvmTest
+./gradlew \
+  zstd-kmp:jvmTest \
+  zstd-kmp-okio:jvmTest \
+  zstd-kmp:macosArm64Test \
+  zstd-kmp-okio:macosArm64Test
 ```
 
 [kmp]: https://kotlinlang.org/docs/multiplatform.html
