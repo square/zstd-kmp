@@ -110,22 +110,12 @@ git submodule init
 git submodule update
 ```
 
-### cmake
+### Build JNI libraries
 
 ```
-brew install cmake
-```
-
-### Build JNI libraries on macOS
-
-```
-./zstd-kmp/src/jvmMain/build-mac.sh
-```
-
-### Build JNI libraries on Linux
-
-```
-./zstd-kmp/src/jvmMain/build-linux.sh
+pushd zstd-kmp
+zig build --verbose -p src/jvmMain/resources/jni
+popd
 ```
 
 ### Test it:
