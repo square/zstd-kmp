@@ -16,11 +16,13 @@
 package com.squareup.zstd.okio
 
 import com.squareup.zstd.ZstdDecompressor
+import com.squareup.zstd.getErrorName
 import kotlin.jvm.JvmField
 import okio.Buffer
 import okio.Buffer.UnsafeCursor
 import okio.BufferedSource
 import okio.EOFException
+import okio.IOException
 import okio.Source
 import okio.Timeout
 import okio.use
@@ -103,7 +105,9 @@ internal class ZstdDecompressSource internal constructor(
       }
 
       lastDecompressResult = result
-      result.checkError()
+      getErrorName(result)?.let { errorName ->
+        throw IOException("zstd decompress failed: $errorName")
+      }
     }
   }
 

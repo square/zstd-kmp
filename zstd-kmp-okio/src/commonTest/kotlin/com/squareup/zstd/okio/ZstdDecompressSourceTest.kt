@@ -16,6 +16,7 @@
 package com.squareup.zstd.okio
 
 import assertk.assertThat
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import kotlin.random.Random
 import kotlin.test.Test
@@ -23,6 +24,7 @@ import kotlin.test.assertFailsWith
 import okio.Buffer
 import okio.ByteString
 import okio.EOFException
+import okio.IOException
 import okio.buffer
 import okio.use
 
@@ -65,6 +67,19 @@ class ZstdDecompressSourceTest {
       assertFailsWith<EOFException> {
         it.readByteString()
       }
+    }
+  }
+
+  @Test
+  fun sourceIsMalformed() {
+    val truncated = Buffer()
+    truncated.writeUtf8("this is not zstd data")
+
+    truncated.zstdDecompress().buffer().use {
+      val e = assertFailsWith<IOException> {
+        it.readByteString()
+      }
+      assertThat(e).hasMessage("zstd decompress failed: Unknown frame descriptor")
     }
   }
 

@@ -18,11 +18,9 @@
 
 package com.squareup.zstd.okio
 
-import com.squareup.zstd.getErrorName
 import com.squareup.zstd.zstdCompressor
 import com.squareup.zstd.zstdDecompressor
 import kotlin.jvm.JvmName
-import okio.IOException
 import okio.Sink
 import okio.Source
 import okio.buffer
@@ -34,9 +32,3 @@ fun Sink.zstdCompress(): Sink = ZstdCompressSink(this.buffer(), zstdCompressor()
 fun Source.zstdDecompress(): Source = ZstdDecompressSource(this.buffer(), zstdDecompressor())
 
 internal val emptyByteArray = ByteArray(0)
-
-@Throws(IOException::class)
-internal fun Long.checkError(): Long {
-  val errorName = getErrorName(this) ?: return this
-  throw IOException(errorName)
-}
