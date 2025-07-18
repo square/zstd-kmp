@@ -56,16 +56,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        arch: [amd64]
         native-test-tasks: ["linuxX64Test"]
         include:
           - os: macos-latest-large
-            arch: x86_64
             native-test-tasks: "macosX64Test iosX64Test"
           - os: macos-latest
-            arch: aarch64
             native-test-tasks: "macosArm64Test iosSimulatorArm64Test"
-        # TODO: build on 'windows-latest'
+          - os: windows-latest
+            native-test-tasks: "mingwX64Test"
 
     runs-on: ${{ matrix.os }}
 
@@ -83,9 +81,6 @@ jobs:
         with:
           name: jni-binaries
           path: zstd-kmp/src/jvmMain/resources/jni
-
-      - name: Find
-        run: find zstd-kmp/src/jvmMain
 
       - name: Kotlin/JVM test
         run: ./gradlew jvmTest
