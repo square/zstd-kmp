@@ -27,9 +27,10 @@ internal actual fun loadNativeLibrary() {
   val osName = System.getProperty("os.name").lowercase(US)
   val osArch = System.getProperty("os.arch").lowercase(US)
   val resourcePath = when {
+    osName.contains("windows") -> "/jni/$osArch/zstd-kmp.dll"
     osName.contains("linux") -> "/jni/$osArch/libzstd-kmp.so"
     osName.contains("mac") -> "/jni/$osArch/libzstd-kmp.dylib"
-    else -> error("Unsupported OS: $osName")
+    else -> error("Unsupported OS: $osName (arch=$osArch)")
   }
 
   // File-based deleteOnExit() uses a special internal shutdown hook that always runs last.
