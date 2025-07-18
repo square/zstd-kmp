@@ -83,7 +83,7 @@ allprojects {
         Visibility.PROTECTED
       ))
       reportUndocumented.set(false)
-      jdkVersion.set(11)
+      jdkVersion.set(8)
 
       sourceLink {
         localDirectory.set(rootProject.projectDir)
@@ -111,13 +111,13 @@ allprojects {
 
   plugins.withId("org.jetbrains.kotlin.multiplatform") {
     configure<KotlinMultiplatformExtension> {
-      jvmToolchain(11)
+      jvmToolchain(8)
     }
   }
 
   plugins.withId("org.jetbrains.kotlin.jvm") {
     configure<KotlinJvmProjectExtension> {
-      jvmToolchain(11)
+      jvmToolchain(8)
     }
   }
 
