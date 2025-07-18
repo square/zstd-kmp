@@ -158,7 +158,7 @@ allprojects {
       publishToMavenCentral(automaticRelease = true)
       signAllPublications()
       pom {
-        description.set("ZStandard for Kotlin Multiplatform")
+        description.set("Zstandard for Kotlin Multiplatform")
         name.set(project.name)
         url.set("https://github.com/square/okio-zstd/")
         licenses {

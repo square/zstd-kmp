@@ -25,10 +25,10 @@ import okio.Sink
 import okio.Source
 import okio.buffer
 
-/** Returns a [Sink] that compresses its data with ZStandard before forwarding to this. */
+/** Returns a [Sink] that compresses its data with Zstandard before forwarding to this. */
 fun Sink.zstdCompress(): Sink = ZstdCompressSink(this.buffer(), zstdCompressor())
 
-/** Returns a [Source] that decompresses its data with ZStandard after reading from this. */
+/** Returns a [Source] that decompresses its data with Zstandard after reading from this. */
 fun Source.zstdDecompress(): Source = ZstdDecompressSource(this.buffer(), zstdDecompressor())
 
 internal val emptyByteArray = ByteArray(0)
