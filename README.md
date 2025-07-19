@@ -1,14 +1,14 @@
 ZSTD-KMP
 ========
 
-The [ZStandard compression library (zstd)][zstd], packaged for [Kotlin multiplatform (kmp)][kmp].
+The [Zstandard compression library (zstd)][zstd], packaged for [Kotlin multiplatform (kmp)][kmp].
 
-This is intended to be a small library that supports common ZStandard use-cases with zero additional
+This is intended to be a small library that supports common Zstandard use-cases with zero additional
 dependencies. For more advanced features, consider using [zstd] directly.
 
 This library is packaged as two modules:
 
- * `zstd-kmp`: direct access to ZStandard APIs.
+ * `zstd-kmp`: direct access to Zstandard APIs.
  * `zstd-kmp-okio`: [Okio] integration.
 
 
