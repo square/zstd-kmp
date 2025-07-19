@@ -22,7 +22,7 @@ In `gradle/libs.versions.toml`:
 ```toml
 [libraries]
 okio-core = { module = "com.squareup.okio:okio", version = "3.15.0" }
-zstd-kmp-okio = { module = "com.squareup.zstd:zstd-kmp-okio", version = "0.2.0" }
+zstd-kmp-okio = { module = "com.squareup.zstd:zstd-kmp-okio", version = "0.3.0" }
 ```
 
 In `build.gradle.kts`:
