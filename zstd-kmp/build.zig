@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) !void {
   try setupTarget(b, &deleteLib.step, .macos, .aarch64, "aarch64");
   try setupTarget(b, &deleteLib.step, .macos, .x86_64, "x86_64");
   try setupTarget(b, &deleteLib.step, .windows, .x86_64, "amd64");
+  try setupTarget(b, &deleteLib.step, .windows, .aarch64, "aarch64");
 }
 
 fn setupTarget(b: *std.Build, step: *std.Build.Step, tag: std.Target.Os.Tag, arch: std.Target.Cpu.Arch, dir: []const u8) !void {
