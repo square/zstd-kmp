@@ -19,4 +19,4 @@ shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:sha
 lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-4"
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "7.2.0" }
+spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
