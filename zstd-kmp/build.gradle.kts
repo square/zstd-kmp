@@ -3,6 +3,7 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
 
 plugins {
   kotlin("multiplatform")
@@ -11,6 +12,7 @@ plugins {
   id("com.vanniktech.maven.publish.base")
   id("co.touchlab.cklib")
   id("binary-compatibility-validator")
+  id("com.jakewharton.test-distribution")
 }
 
 kotlin {
@@ -20,9 +22,10 @@ kotlin {
 
   jvm()
 
+  linuxArm64()
   linuxX64()
-  macosX64()
   macosArm64()
+  macosX64()
   mingwX64()
   iosArm64()
   iosX64()
@@ -63,6 +66,13 @@ kotlin {
         api(libs.assertk)
         api(libs.okio.core)
       }
+    }
+  }
+
+  val linkNativeDebugTests = tasks.register("linkNativeDebugTests")
+  targets.withType<KotlinNativeTarget> {
+    linkNativeDebugTests.configure {
+      dependsOn(compilations.getByName(TEST_COMPILATION_NAME).binariesTaskName)
     }
   }
 }
