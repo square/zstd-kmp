@@ -2,7 +2,7 @@
 compileSdk = "35"
 kotlin = "2.2.0"
 minSdk = "21"
-okio = "3.15.0"
+okio = "3.16.0"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version = "8.11.1" }
