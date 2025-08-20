@@ -1,3 +1,4 @@
+import com.android.build.api.variant.HasUnitTestBuilder
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
@@ -67,6 +68,13 @@ dependencies {
       artifactType("aar")
     }
   )
+}
+
+// Disable host-side unit tests. Testing is done with device instrumentation tests.
+androidComponents {
+  beforeVariants {
+    (it as HasUnitTestBuilder).enableUnitTest = false
+  }
 }
 
 android {
