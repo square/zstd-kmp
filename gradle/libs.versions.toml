@@ -5,7 +5,7 @@ minSdk = "21"
 okio = "3.16.0"
 
 [libraries]
-android-gradle-plugin = { module = "com.android.tools.build:gradle", version = "8.12.2" }
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version = "8.13.0" }
 androidx-test-runner = { module = "androidx.test:runner", version = "1.7.0" }
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 binary-compatibility-validator-gradle-plugin = { module = "org.jetbrains.kotlinx.binary-compatibility-validator:org.jetbrains.kotlinx.binary-compatibility-validator.gradle.plugin", version = "0.18.1" }
