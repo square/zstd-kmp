@@ -23,6 +23,7 @@ import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import okio.Buffer
 import okio.ByteString
+import okio.ByteString.Companion.toByteString
 import okio.EOFException
 import okio.IOException
 import okio.buffer
@@ -45,7 +46,7 @@ class ZstdDecompressSourceTest {
   }
 
   private fun testRoundTrip(byteCount: Int) {
-    val compressed = RandomSource(Random(1), byteCount)
+    val compressed = Random(1).nextBytes(byteCount)
       .referenceCompress()
 
     val decompressed = compressed.zstdDecompress().buffer().use {
@@ -53,12 +54,12 @@ class ZstdDecompressSourceTest {
     }
 
     assertThat(decompressed)
-      .isEqualTo(RandomSource(Random(1), byteCount).buffer().readByteString())
+      .isEqualTo(Random(1).nextBytes(byteCount).toByteString())
   }
 
   @Test
   fun sourceIsTruncated() {
-    val compressed = RandomSource(Random(1), 1024)
+    val compressed = Random(1).nextBytes(1024)
       .referenceCompress()
     val truncated = Buffer()
     truncated.write(compressed, compressed.size - 1L)

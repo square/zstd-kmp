@@ -17,7 +17,6 @@ package com.squareup.zstd.okio
 
 import okio.Buffer
 import okio.ByteString
-import okio.Source
 import okio.buffer
 import okio.use
 
@@ -27,10 +26,10 @@ actual fun Buffer.referenceDecompress(): ByteString {
   }
 }
 
-actual fun Source.referenceCompress(): Buffer {
+actual fun ByteArray.referenceCompress(): Buffer {
   val result = Buffer()
   result.zstdCompress().buffer().use {
-    it.writeAll(this@referenceCompress)
+    it.write(this@referenceCompress)
   }
   return result
 }

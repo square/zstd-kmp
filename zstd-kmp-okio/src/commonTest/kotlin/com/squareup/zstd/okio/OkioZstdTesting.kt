@@ -15,35 +15,11 @@
  */
 package com.squareup.zstd.okio
 
-import kotlin.random.Random
 import okio.Buffer
 import okio.ByteString
-import okio.Source
-import okio.Timeout
-
-/** Returns [byteCount] bytes from [random]. */
-class RandomSource(
-  val random: Random,
-  byteCount: Int,
-) : Source {
-  private var remaining = byteCount.toLong()
-
-  override fun read(sink: Buffer, byteCount: Long): Long {
-    val toRead = minOf(byteCount, remaining)
-    if (toRead == 0L) return -1L
-    sink.write(random.nextBytes(toRead.toInt()))
-    remaining -= toRead
-    return toRead
-  }
-
-  override fun timeout() = Timeout.Companion.NONE
-
-  override fun close() {
-  }
-}
 
 /** Decompress using a different implementation, where available. */
 expect fun Buffer.referenceDecompress(): ByteString
 
 /** Compress using a different implementation, where available. */
-expect fun Source.referenceCompress(): Buffer
+expect fun ByteArray.referenceCompress(): Buffer
