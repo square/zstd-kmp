@@ -19,7 +19,6 @@ import com.github.luben.zstd.ZstdInputStream
 import com.github.luben.zstd.ZstdOutputStream
 import okio.Buffer
 import okio.ByteString
-import okio.Source
 import okio.buffer
 import okio.sink
 import okio.source
@@ -42,10 +41,10 @@ actual fun Buffer.referenceDecompress(): ByteString {
 /**
  * Compress using Zstd-jni.
  */
-actual fun Source.referenceCompress(): Buffer {
+actual fun ByteArray.referenceCompress(): Buffer {
   val result = Buffer()
   ZstdOutputStream(result.outputStream()).sink().buffer().use {
-    it.writeAll(this@referenceCompress)
+    it.write(this@referenceCompress)
   }
   return result
 }

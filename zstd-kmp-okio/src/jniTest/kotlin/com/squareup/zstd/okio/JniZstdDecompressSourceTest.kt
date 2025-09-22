@@ -62,7 +62,7 @@ class JniZstdDecompressSourceTest {
   /** Confirm we can clean up even if reads aren't working. */
   @Test
   fun readFailure() {
-    val delegate = RandomSource(Random(1), 1024 * 1024)
+    val delegate = Random(1).nextBytes(1024 * 1024)
       .referenceCompress()
     var sourceClosed = false
     var explode = false

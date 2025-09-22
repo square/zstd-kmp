@@ -63,7 +63,7 @@ class JniZstdCompressSinkTest {
     val zstdCompressSink = ZstdCompressSink(sink.buffer(), compressor)
 
     assertFailsWith<IOException> {
-      zstdCompressSink.buffer().writeAll(RandomSource(Random(1), 1024 * 1024))
+      zstdCompressSink.buffer().write(Random(1).nextBytes(1024 * 1024))
     }
     assertThat(zstdCompressSink.closed).isFalse()
     assertThat(compressor.cctxPointer).isNotEqualTo(0L)

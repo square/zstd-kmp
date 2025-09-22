@@ -20,6 +20,7 @@ import assertk.assertions.isEqualTo
 import kotlin.random.Random
 import kotlin.test.Test
 import okio.Buffer
+import okio.ByteString.Companion.toByteString
 import okio.buffer
 import okio.use
 
@@ -42,9 +43,9 @@ class ZstdCompressSinkTest {
   private fun testRoundTrip(byteCount: Int) {
     val compressed = Buffer()
     compressed.zstdCompress().buffer().use {
-      it.writeAll(RandomSource(Random(1), byteCount))
+      it.write(Random(1).nextBytes(byteCount))
     }
     assertThat(compressed.referenceDecompress())
-      .isEqualTo(RandomSource(Random(1), byteCount).buffer().readByteString())
+      .isEqualTo(Random(1).nextBytes(byteCount).toByteString())
   }
 }
