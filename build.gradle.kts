@@ -8,8 +8,10 @@ import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.gradle.AbstractDokkaTask
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 buildscript {
   repositories {
@@ -110,16 +112,16 @@ allprojects {
     enabled = project.findProperty("signingInMemoryKey") != null
   }
 
-  plugins.withId("org.jetbrains.kotlin.multiplatform") {
-    configure<KotlinMultiplatformExtension> {
-      jvmToolchain(8)
+  val javaVersion = JavaVersion.VERSION_1_8
+  tasks.withType(KotlinJvmCompile::class.java).configureEach {
+    compilerOptions {
+      freeCompilerArgs.add("-Xjdk-release=$javaVersion")
+      jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
     }
   }
-
-  plugins.withId("org.jetbrains.kotlin.jvm") {
-    configure<KotlinJvmProjectExtension> {
-      jvmToolchain(8)
-    }
+  tasks.withType(JavaCompile::class.java).configureEach {
+    sourceCompatibility = javaVersion.toString()
+    targetCompatibility = javaVersion.toString()
   }
 
   plugins.withId("com.vanniktech.maven.publish.base") {
