@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+## Version 0.4.0
+
+_2025-10-02_
+
  * Fix: Don't ship an unused copy of `libzstd.so` in our Android APKs. We were inadvertently
    packaging our Android `.aar` libraries with both `libzstd-kmp.so` and `libzstd.so`, but only
    ever using the first one.
