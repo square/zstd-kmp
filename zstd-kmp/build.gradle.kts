@@ -129,6 +129,7 @@ android {
         arguments("-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_static")
         cFlags("-fstrict-aliasing")
         cppFlags("-fstrict-aliasing")
+        targets("zstd-kmp")
       }
     }
   }
