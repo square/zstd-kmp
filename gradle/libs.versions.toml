@@ -17,7 +17,7 @@ mavenPublish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plu
 okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
 shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:shadow", version = "8.0.0" }
 lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-4"
-testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-plugin:0.1.1"
+testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-plugin:0.2.0"
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version = "8.0.0" }
