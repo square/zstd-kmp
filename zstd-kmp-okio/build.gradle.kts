@@ -1,19 +1,31 @@
-import com.android.build.api.variant.HasUnitTestBuilder
+
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 
 plugins {
   kotlin("multiplatform")
-  id("com.android.library")
+  id("com.android.kotlin.multiplatform.library")
   id("org.jetbrains.dokka")
   id("com.vanniktech.maven.publish.base")
   id("binary-compatibility-validator")
 }
 
 kotlin {
-  androidTarget {
-    publishLibraryVariants("release")
+  android {
+    namespace = "com.squareup.zstd.okio"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+//    defaultConfig {
+//      minSdk = libs.versions.minSdk.get().toInt()
+//      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//    }
+
+//    // TODO: Remove when https://issuetracker.google.com/issues/260059413 is resolved.
+//    compileOptions {
+//      sourceCompatibility = JavaVersion.VERSION_11
+//      targetCompatibility = JavaVersion.VERSION_11
+//    }
   }
 
   jvm()
@@ -54,44 +66,21 @@ kotlin {
         implementation(libs.lubenZstdJni)
       }
     }
-    val androidInstrumentedTest by getting {
-      dependsOn(commonTest)
-      kotlin.srcDir("src/jniTest/kotlin")
-    }
+//    val androidInstrumentedTest by getting {
+//      dependsOn(commonTest)
+//      kotlin.srcDir("src/jniTest/kotlin")
+//    }
   }
 }
 
-dependencies {
-  androidTestImplementation(libs.androidx.test.runner)
-  androidTestImplementation(
-    variantOf(libs.lubenZstdJni) {
-      artifactType("aar")
-    }
-  )
-}
-
-// Disable host-side unit tests. Testing is done with device instrumentation tests.
-androidComponents {
-  beforeVariants {
-    (it as HasUnitTestBuilder).enableUnitTest = false
-  }
-}
-
-android {
-  namespace = "com.squareup.zstd.okio"
-  compileSdk = libs.versions.compileSdk.get().toInt()
-
-  defaultConfig {
-    minSdk = libs.versions.minSdk.get().toInt()
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-  }
-
-  // TODO: Remove when https://issuetracker.google.com/issues/260059413 is resolved.
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-  }
-}
+//dependencies {
+//  androidTestImplementation(libs.androidx.test.runner)
+//  androidTestImplementation(
+//    variantOf(libs.lubenZstdJni) {
+//      artifactType("aar")
+//    }
+//  )
+//}
 
 configure<MavenPublishBaseExtension> {
   configure(

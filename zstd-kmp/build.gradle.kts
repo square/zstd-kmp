@@ -1,14 +1,14 @@
+
 import co.touchlab.cklib.gradle.CompileToBitcode.Language.C
-import com.android.build.api.variant.HasUnitTestBuilder
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation.Companion.TEST_COMPILATION_NAME
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
   kotlin("multiplatform")
-  id("com.android.library")
+  id("com.android.kotlin.multiplatform.library")
   id("org.jetbrains.dokka")
   id("com.vanniktech.maven.publish.base")
   id("co.touchlab.cklib")
@@ -17,8 +17,61 @@ plugins {
 }
 
 kotlin {
-  androidTarget {
-    publishLibraryVariants("release")
+  android {
+    namespace = "com.squareup.zstd"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+    minSdk = libs.versions.minSdk.get().toInt()
+
+    withDeviceTest {
+      instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+
+
+//      ndk {
+//        abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+//      }
+//
+//      externalNativeBuild {
+//        cmake {
+//          arguments("-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_static")
+//          cFlags("-fstrict-aliasing")
+//          cppFlags("-fstrict-aliasing")
+//          targets("zstd-kmp")
+//        }
+//      }
+
+    // TODO: Remove when https://issuetracker.google.com/issues/260059413 is resolved.
+//    compileOptions {
+//      sourceCompatibility = JavaVersion.VERSION_11
+//      targetCompatibility = JavaVersion.VERSION_11
+//    }
+
+//    buildTypes {
+//      val release by getting {
+//        externalNativeBuild {
+//          cmake {
+//            arguments("-DCMAKE_BUILD_TYPE=MinSizeRel")
+//            cFlags("-g0", "-Os", "-fomit-frame-pointer", "-DNDEBUG", "-fvisibility=hidden")
+//            cppFlags("-g0", "-Os", "-fomit-frame-pointer", "-DNDEBUG", "-fvisibility=hidden")
+//          }
+//        }
+//      }
+//      val debug by getting {
+//        externalNativeBuild {
+//          cmake {
+//            cFlags("-g", "-DDEBUG", "-DDUMP_LEAKS")
+//            cppFlags("-g", "-DDEBUG", "-DDUMP_LEAKS")
+//          }
+//        }
+//      }
+//    }
+
+//    externalNativeBuild {
+//      cmake {
+//        path = file("src/androidMain/CMakeLists.txt")
+//      }
+//    }
   }
 
   jvm()
@@ -100,70 +153,6 @@ cklib {
         "-Wno-unused-parameter" /* for windows 32 */
       )
     )
-  }
-}
-
-// Disable host-side unit tests. Testing is done with device instrumentation tests.
-androidComponents {
-  beforeVariants {
-    (it as HasUnitTestBuilder).enableUnitTest = false
-  }
-}
-
-android {
-  namespace = "com.squareup.zstd"
-  compileSdk = libs.versions.compileSdk.get().toInt()
-
-  defaultConfig {
-    minSdk = libs.versions.minSdk.get().toInt()
-    multiDexEnabled = true
-
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-    ndk {
-      abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
-    }
-
-    externalNativeBuild {
-      cmake {
-        arguments("-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_static")
-        cFlags("-fstrict-aliasing")
-        cppFlags("-fstrict-aliasing")
-        targets("zstd-kmp")
-      }
-    }
-  }
-
-  // TODO: Remove when https://issuetracker.google.com/issues/260059413 is resolved.
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-  }
-
-  buildTypes {
-    val release by getting {
-      externalNativeBuild {
-        cmake {
-          arguments("-DCMAKE_BUILD_TYPE=MinSizeRel")
-          cFlags("-g0", "-Os", "-fomit-frame-pointer", "-DNDEBUG", "-fvisibility=hidden")
-          cppFlags("-g0", "-Os", "-fomit-frame-pointer", "-DNDEBUG", "-fvisibility=hidden")
-        }
-      }
-    }
-    val debug by getting {
-      externalNativeBuild {
-        cmake {
-          cFlags("-g", "-DDEBUG", "-DDUMP_LEAKS")
-          cppFlags("-g", "-DDEBUG", "-DDUMP_LEAKS")
-        }
-      }
-    }
-  }
-
-  externalNativeBuild {
-    cmake {
-      path = file("src/androidMain/CMakeLists.txt")
-    }
   }
 }
 
