@@ -16,7 +16,7 @@ kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", v
 mavenPublish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.34.0" }
 okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
 shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:shadow", version = "8.0.0" }
-lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-5"
+lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-6"
 testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-plugin:0.2.0"
 
 [plugins]
