@@ -13,7 +13,7 @@ cklib-gradle-plugin = { module = "co.touchlab:cklib-gradle-plugin", version = "0
 dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version = "2.1.0" }
 junit = { module = "junit:junit", version = "4.13.2" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-mavenPublish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.34.0" }
+mavenPublish-gradle-plugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version = "0.35.0" }
 okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
 shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:shadow", version = "8.0.0" }
 lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-6"
