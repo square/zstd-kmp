@@ -28,8 +28,6 @@ actual fun Buffer.referenceDecompress(): ByteString {
 
 actual fun ByteArray.referenceCompress(): Buffer {
   val result = Buffer()
-  result.zstdCompress().buffer().use {
-    it.write(this@referenceCompress)
-  }
+  result.zstdCompress().buffer().use { it.write(this@referenceCompress) }
   return result
 }

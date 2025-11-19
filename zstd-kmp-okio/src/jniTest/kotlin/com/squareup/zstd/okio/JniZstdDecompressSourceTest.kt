@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress(
-  "CANNOT_OVERRIDE_INVISIBLE_MEMBER",
-  "INVISIBLE_MEMBER",
-  "INVISIBLE_REFERENCE",
-)
+@file:Suppress("CANNOT_OVERRIDE_INVISIBLE_MEMBER", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
 package com.squareup.zstd.okio
 
@@ -62,29 +58,27 @@ class JniZstdDecompressSourceTest {
   /** Confirm we can clean up even if reads aren't working. */
   @Test
   fun readFailure() {
-    val delegate = Random(1).nextBytes(1024 * 1024)
-      .referenceCompress()
+    val delegate = Random(1).nextBytes(1024 * 1024).referenceCompress()
     var sourceClosed = false
     var explode = false
-    val source = object : Source by delegate {
-      override fun read(sink: Buffer, byteCount: Long): Long {
-        val result = delegate.read(sink, byteCount)
-        if (explode) throw IOException("boom!")
-        return result
-      }
+    val source =
+      object : Source by delegate {
+        override fun read(sink: Buffer, byteCount: Long): Long {
+          val result = delegate.read(sink, byteCount)
+          if (explode) throw IOException("boom!")
+          return result
+        }
 
-      override fun close() {
-        sourceClosed = true
+        override fun close() {
+          sourceClosed = true
+        }
       }
-    }
 
     val decompressor = JniZstdDecompressor()
     val zstdDecompressSource = ZstdDecompressSource(source.buffer(), decompressor)
 
     explode = true
-    assertFailsWith<IOException> {
-      zstdDecompressSource.buffer().require(1024L)
-    }
+    assertFailsWith<IOException> { zstdDecompressSource.buffer().require(1024L) }
     assertThat(zstdDecompressSource.closed).isFalse()
     assertThat(decompressor.dctxPointer).isNotEqualTo(0L)
     assertThat(sourceClosed).isFalse()

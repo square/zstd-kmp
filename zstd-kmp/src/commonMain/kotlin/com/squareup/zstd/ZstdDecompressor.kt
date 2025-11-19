@@ -19,12 +19,10 @@ import kotlin.jvm.JvmField
 
 abstract class ZstdDecompressor : AutoCloseable {
   /** The number of bytes consumed on the most recent call to [decompressStream]. */
-  @JvmField
-  var inputBytesProcessed: Int = -1
+  @JvmField var inputBytesProcessed: Int = -1
 
   /** The number of bytes produced on the most recent call to [decompressStream]. */
-  @JvmField
-  var outputBytesProcessed: Int = -1
+  @JvmField var outputBytesProcessed: Int = -1
 
   abstract fun decompressStream(
     outputByteArray: ByteArray,

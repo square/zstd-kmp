@@ -17,8 +17,8 @@ package com.squareup.zstd
 
 internal class JniZstdDecompressor : ZstdDecompressor() {
   @JvmField
-  var dctxPointer = createZstdDecompressor()
-    .also {
+  var dctxPointer =
+    createZstdDecompressor().also {
       if (it == 0L) throw OutOfMemoryError("createZstdDecompressor failed")
     }
 
@@ -29,16 +29,17 @@ internal class JniZstdDecompressor : ZstdDecompressor() {
     inputByteArray: ByteArray,
     inputEnd: Int,
     inputStart: Int,
-  ): Long = decompressStream(
-    jniPointer = jniZstdPointer,
-    dctxPointer = dctxPointer,
-    outputByteArray = outputByteArray,
-    outputEnd = outputEnd,
-    outputStart = outputStart,
-    inputByteArray = inputByteArray,
-    inputEnd = inputEnd,
-    inputStart = inputStart,
-  )
+  ): Long =
+    decompressStream(
+      jniPointer = jniZstdPointer,
+      dctxPointer = dctxPointer,
+      outputByteArray = outputByteArray,
+      outputEnd = outputEnd,
+      outputStart = outputStart,
+      inputByteArray = inputByteArray,
+      inputEnd = inputEnd,
+      inputStart = inputStart,
+    )
 
   override fun close() {
     val cctxPointerToClose = dctxPointer

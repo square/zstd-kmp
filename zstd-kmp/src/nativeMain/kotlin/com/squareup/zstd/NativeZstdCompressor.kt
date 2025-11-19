@@ -31,12 +31,11 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
 
 internal class NativeZstdCompressor : ZstdCompressor() {
-  private var cctx = ZSTD_createCCtx()
-    .also {
-      if (it == null) throw OutOfMemoryError("ZSTD_createCCtx failed")
-    }
+  private var cctx =
+    ZSTD_createCCtx().also { if (it == null) throw OutOfMemoryError("ZSTD_createCCtx failed") }
 
-  override fun setParameter(param: Int, value: Int): Long = ZSTD_CCtx_setParameter(cctx, param.toUInt(), value).toLong()
+  override fun setParameter(param: Int, value: Int): Long =
+    ZSTD_CCtx_setParameter(cctx, param.toUInt(), value).toLong()
 
   override fun compressStream2(
     outputByteArray: ByteArray,
@@ -53,29 +52,33 @@ internal class NativeZstdCompressor : ZstdCompressor() {
           val outputStart = outputStart.toULong()
           val outputEnd = outputEnd.toULong()
           val zstdOutput = alloc<ZSTD_outBuffer>()
-          zstdOutput.dst = when {
-            outputStart < outputEnd -> outputDataPinned.addressOf(0)
-            else -> null
-          }
+          zstdOutput.dst =
+            when {
+              outputStart < outputEnd -> outputDataPinned.addressOf(0)
+              else -> null
+            }
           zstdOutput.pos = outputStart
           zstdOutput.size = outputEnd
 
           val inputStart = inputStart.toULong()
           val inputEnd = inputEnd.toULong()
           val zstdInput = alloc<ZSTD_inBuffer>()
-          zstdInput.src = when {
-            inputStart < inputEnd -> inputDataPinned.addressOf(0)
-            else -> null
-          }
+          zstdInput.src =
+            when {
+              inputStart < inputEnd -> inputDataPinned.addressOf(0)
+              else -> null
+            }
           zstdInput.pos = inputStart
           zstdInput.size = inputEnd
 
-          val result = ZSTD_compressStream2(
-            cctx = cctx,
-            output = zstdOutput.ptr,
-            input = zstdInput.ptr,
-            endOp = mode.toUInt(),
-          ).toLong()
+          val result =
+            ZSTD_compressStream2(
+                cctx = cctx,
+                output = zstdOutput.ptr,
+                input = zstdInput.ptr,
+                endOp = mode.toUInt(),
+              )
+              .toLong()
 
           outputBytesProcessed = (zstdOutput.pos - outputStart).toInt()
           inputBytesProcessed = (zstdInput.pos - inputStart).toInt()

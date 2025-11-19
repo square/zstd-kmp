@@ -19,12 +19,10 @@ import kotlin.jvm.JvmField
 
 abstract class ZstdCompressor : AutoCloseable {
   /** The number of bytes consumed on the most recent call to [compressStream2]. */
-  @JvmField
-  var inputBytesProcessed: Int = -1
+  @JvmField var inputBytesProcessed: Int = -1
 
   /** The number of bytes produced on the most recent call to [compressStream2]. */
-  @JvmField
-  var outputBytesProcessed: Int = -1
+  @JvmField var outputBytesProcessed: Int = -1
 
   /** @param like [ZSTD_c_compressionLevel] or [ZSTD_c_checksumFlag]. */
   abstract fun setParameter(param: Int, value: Int): Long

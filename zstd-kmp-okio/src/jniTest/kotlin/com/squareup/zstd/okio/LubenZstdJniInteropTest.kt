@@ -51,16 +51,12 @@ internal class LubenZstdJniInteropTest {
   private fun decompress(compressed: ByteArray): ByteString {
     val buffer = Buffer()
     buffer.write(compressed)
-    return buffer.zstdDecompress().buffer().use {
-      it.readByteString()
-    }
+    return buffer.zstdDecompress().buffer().use { it.readByteString() }
   }
 
   private fun compress(original: ByteString): Buffer {
     val compressed = Buffer()
-    compressed.zstdCompress().buffer().use { sink ->
-      sink.write(original)
-    }
+    compressed.zstdCompress().buffer().use { sink -> sink.write(original) }
     return compressed
   }
 }

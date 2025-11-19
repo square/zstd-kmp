@@ -42,9 +42,7 @@ class ZstdCompressSinkTest {
 
   private fun testRoundTrip(byteCount: Int) {
     val compressed = Buffer()
-    compressed.zstdCompress().buffer().use {
-      it.write(Random(1).nextBytes(byteCount))
-    }
+    compressed.zstdCompress().buffer().use { it.write(Random(1).nextBytes(byteCount)) }
     assertThat(compressed.referenceDecompress())
       .isEqualTo(Random(1).nextBytes(byteCount).toByteString())
   }
