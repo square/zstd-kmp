@@ -32,19 +32,13 @@ import okio.use
  */
 actual fun Buffer.referenceDecompress(): ByteString {
   val result = Buffer()
-  ZstdInputStream(inputStream()).source().use {
-    result.writeAll(it)
-  }
+  ZstdInputStream(inputStream()).source().use { result.writeAll(it) }
   return result.readByteString()
 }
 
-/**
- * Compress using Zstd-jni.
- */
+/** Compress using Zstd-jni. */
 actual fun ByteArray.referenceCompress(): Buffer {
   val result = Buffer()
-  ZstdOutputStream(result.outputStream()).sink().buffer().use {
-    it.write(this@referenceCompress)
-  }
+  ZstdOutputStream(result.outputStream()).sink().buffer().use { it.write(this@referenceCompress) }
   return result
 }

@@ -29,15 +29,15 @@ import okio.use
 
 /**
  * This satisfies reads with the following process:
- *
- *  1. Decompresses at least 1 byte from [source] into [outputBuffer].
- *  2. Serves the read request from [outputBuffer].
+ * 1. Decompresses at least 1 byte from [source] into [outputBuffer].
+ * 2. Serves the read request from [outputBuffer].
  *
  * Each attempt to decompress returns 0 if the frame is complete, and non-zero otherwise. This
  * tracks that most recent result so it can throw [EOFException] if the source is exhausted
  * mid-frame.
  */
-internal class ZstdDecompressSource internal constructor(
+internal class ZstdDecompressSource
+internal constructor(
   @JvmField val source: BufferedSource,
   private val decompressor: ZstdDecompressor,
 ) : Source {
@@ -50,8 +50,7 @@ internal class ZstdDecompressSource internal constructor(
 
   private var lastDecompressResult = 0L
 
-  @JvmField
-  var closed = false
+  @JvmField var closed = false
 
   override fun read(sink: Buffer, byteCount: Long): Long {
     require(byteCount >= 0L) { "byteCount < 0: $byteCount" }
@@ -68,10 +67,7 @@ internal class ZstdDecompressSource internal constructor(
 
     outputBuffer.clear()
 
-    source.use {
-      decompressor.use {
-      }
-    }
+    source.use { decompressor.use {} }
   }
 
   private fun refillIfNecessary() {
@@ -90,14 +86,15 @@ internal class ZstdDecompressSource internal constructor(
 
         source.buffer.readUnsafe(inputCursor).use { inputCursor ->
           inputCursor.next()
-          result = decompressor.decompressStream(
-            outputByteArray = outputCursor.data!!,
-            outputEnd = outputCursor.end,
-            outputStart = outputCursor.start,
-            inputByteArray = inputCursor.data!!,
-            inputEnd = inputCursor.end,
-            inputStart = inputCursor.start,
-          )
+          result =
+            decompressor.decompressStream(
+              outputByteArray = outputCursor.data!!,
+              outputEnd = outputCursor.end,
+              outputStart = outputCursor.start,
+              inputByteArray = inputCursor.data!!,
+              inputEnd = inputCursor.end,
+              inputStart = inputCursor.start,
+            )
         }
         source.skip(decompressor.inputBytesProcessed.toLong())
 

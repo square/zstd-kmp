@@ -30,10 +30,8 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.usePinned
 
 internal class NativeZstdDecompressor : ZstdDecompressor() {
-  private var dctx = ZSTD_createDCtx()
-    .also {
-      if (it == null) throw OutOfMemoryError("ZSTD_createDCtx failed")
-    }
+  private var dctx =
+    ZSTD_createDCtx().also { if (it == null) throw OutOfMemoryError("ZSTD_createDCtx failed") }
 
   override fun decompressStream(
     outputByteArray: ByteArray,
@@ -60,11 +58,9 @@ internal class NativeZstdDecompressor : ZstdDecompressor() {
           zstdInput.pos = inputStart
           zstdInput.size = inputEnd
 
-          val result = ZSTD_decompressStream(
-            zds = dctx,
-            output = zstdOutput.ptr,
-            input = zstdInput.ptr,
-          ).toLong()
+          val result =
+            ZSTD_decompressStream(zds = dctx, output = zstdOutput.ptr, input = zstdInput.ptr)
+              .toLong()
 
           outputBytesProcessed = (zstdOutput.pos - outputStart).toInt()
           inputBytesProcessed = (zstdInput.pos - inputStart).toInt()

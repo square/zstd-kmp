@@ -31,15 +31,15 @@ import okio.use
 
 /**
  * This stages all written bytes to [inputBuffer], and then emits to [sink] on these triggers:
- *
- *  * When [Buffer.completeSegmentByteCount] is greater than 0.
- *  * On [flush].
- *  * On [close].
+ * * When [Buffer.completeSegmentByteCount] is greater than 0.
+ * * On [flush].
+ * * On [close].
  *
  * This emits directly to [BufferedSink.buffer]. To avoid that from exhausting memory, this always
  * calls [BufferedSink.emitCompleteSegments] after writing.
  */
-internal class ZstdCompressSink internal constructor(
+internal class ZstdCompressSink
+internal constructor(
   /** The destination for our compressed data. We output directly to this sink's buffer. */
   @JvmField val sink: BufferedSink,
   private val compressor: ZstdCompressor,
@@ -76,23 +76,21 @@ internal class ZstdCompressSink internal constructor(
     if (closed) return
     closed = true
 
-    sink.use {
-      compressor.use {
-        compress(ZSTD_e_end)
-      }
-    }
+    sink.use { compressor.use { compress(ZSTD_e_end) } }
   }
 
   private fun compress(mode: Int) {
     // Decide how many bytes to write immediately.
-    var inputRemaining = when (mode) {
-      ZSTD_e_continue -> {
-        inputBuffer.completeSegmentByteCount()
-          .also { if (it == 0L) return@compress } // No bytes to write immediately.
-      }
+    var inputRemaining =
+      when (mode) {
+        ZSTD_e_continue -> {
+          inputBuffer.completeSegmentByteCount().also {
+            if (it == 0L) return@compress
+          } // No bytes to write immediately.
+        }
 
-      else -> inputBuffer.size
-    }
+        else -> inputBuffer.size
+      }
 
     do {
       var result: Long
@@ -104,29 +102,31 @@ internal class ZstdCompressSink internal constructor(
           // Compress some input. This might not produce any output!
           inputBuffer.readUnsafe(inputCursor).use { inputCursor ->
             inputCursor.next()
-            result = compressor.compressStream2(
-              outputByteArray = outputCursor.data!!,
-              outputEnd = outputCursor.end,
-              outputStart = outputCursor.start,
-              inputByteArray = inputCursor.data!!,
-              inputEnd = inputCursor.end,
-              inputStart = inputCursor.start,
-              mode = mode,
-            )
+            result =
+              compressor.compressStream2(
+                outputByteArray = outputCursor.data!!,
+                outputEnd = outputCursor.end,
+                outputStart = outputCursor.start,
+                inputByteArray = inputCursor.data!!,
+                inputEnd = inputCursor.end,
+                inputStart = inputCursor.start,
+                mode = mode,
+              )
           }
           inputRemaining -= compressor.inputBytesProcessed
           inputBuffer.skip(compressor.inputBytesProcessed.toLong())
         } else {
           // No more input, but possibly more output.
-          result = compressor.compressStream2(
-            outputByteArray = outputCursor.data!!,
-            outputEnd = outputCursor.end,
-            outputStart = outputCursor.start,
-            inputByteArray = emptyByteArray,
-            inputEnd = 0,
-            inputStart = 0,
-            mode = mode,
-          )
+          result =
+            compressor.compressStream2(
+              outputByteArray = outputCursor.data!!,
+              outputEnd = outputCursor.end,
+              outputStart = outputCursor.start,
+              inputByteArray = emptyByteArray,
+              inputEnd = 0,
+              inputStart = 0,
+              mode = mode,
+            )
         }
 
         outputCursor.resizeBuffer(outputSizeBefore + compressor.outputBytesProcessed)
@@ -137,10 +137,11 @@ internal class ZstdCompressSink internal constructor(
         throw IOException("zstd compress failed: $errorName")
       }
 
-      val finished = when (mode) {
-        ZSTD_e_continue -> inputRemaining == 0L
-        else -> inputRemaining == 0L && result == 0L
-      }
+      val finished =
+        when (mode) {
+          ZSTD_e_continue -> inputRemaining == 0L
+          else -> inputRemaining == 0L && result == 0L
+        }
     } while (!finished)
   }
 

@@ -20,16 +20,12 @@ internal val jniZstdPointer: Long = run {
   createJniZstd()
 }
 
-@JvmName("createJniZstd")
-internal external fun createJniZstd(): Long
+@JvmName("createJniZstd") internal external fun createJniZstd(): Long
 
-@JvmName("jniGetErrorName")
-internal external fun jniGetErrorName(code: Long): String?
+@JvmName("jniGetErrorName") internal external fun jniGetErrorName(code: Long): String?
 
-@JvmName("createZstdCompressor")
-internal external fun createZstdCompressor(): Long
+@JvmName("createZstdCompressor") internal external fun createZstdCompressor(): Long
 
-@JvmName("createZstdDecompressor")
-internal external fun createZstdDecompressor(): Long
+@JvmName("createZstdDecompressor") internal external fun createZstdDecompressor(): Long
 
 internal expect fun loadNativeLibrary()

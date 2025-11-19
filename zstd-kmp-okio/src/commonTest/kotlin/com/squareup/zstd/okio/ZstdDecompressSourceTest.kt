@@ -46,28 +46,21 @@ class ZstdDecompressSourceTest {
   }
 
   private fun testRoundTrip(byteCount: Int) {
-    val compressed = Random(1).nextBytes(byteCount)
-      .referenceCompress()
+    val compressed = Random(1).nextBytes(byteCount).referenceCompress()
 
-    val decompressed = compressed.zstdDecompress().buffer().use {
-      it.readByteString()
-    }
+    val decompressed = compressed.zstdDecompress().buffer().use { it.readByteString() }
 
-    assertThat(decompressed)
-      .isEqualTo(Random(1).nextBytes(byteCount).toByteString())
+    assertThat(decompressed).isEqualTo(Random(1).nextBytes(byteCount).toByteString())
   }
 
   @Test
   fun sourceIsTruncated() {
-    val compressed = Random(1).nextBytes(1024)
-      .referenceCompress()
+    val compressed = Random(1).nextBytes(1024).referenceCompress()
     val truncated = Buffer()
     truncated.write(compressed, compressed.size - 1L)
 
     truncated.zstdDecompress().buffer().use {
-      assertFailsWith<EOFException> {
-        it.readByteString()
-      }
+      assertFailsWith<EOFException> { it.readByteString() }
     }
   }
 
@@ -77,9 +70,7 @@ class ZstdDecompressSourceTest {
     truncated.writeUtf8("this is not zstd data")
 
     truncated.zstdDecompress().buffer().use {
-      val e = assertFailsWith<IOException> {
-        it.readByteString()
-      }
+      val e = assertFailsWith<IOException> { it.readByteString() }
       assertThat(e).hasMessage("zstd decompress failed: Unknown frame descriptor")
     }
   }

@@ -42,14 +42,7 @@ apply(plugin = "com.vanniktech.maven.publish.base")
 configure<SpotlessExtension> {
   kotlin {
     target("**/*.kt")
-    ktlint()
-      .editorConfigOverride(
-        mapOf(
-          "ktlint_standard_comment-spacing" to "disabled", // TODO Re-enable
-          "ktlint_standard_filename" to "disabled",
-          "ktlint_standard_indent" to "disabled", // TODO Re-enable
-        )
-      )
+    ktfmt(libs.ktfmt.get().version).googleStyle()
   }
 }
 

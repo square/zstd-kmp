@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress(
-  "CANNOT_OVERRIDE_INVISIBLE_MEMBER",
-  "INVISIBLE_MEMBER",
-  "INVISIBLE_REFERENCE",
-)
+@file:Suppress("CANNOT_OVERRIDE_INVISIBLE_MEMBER", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
 package com.squareup.zstd.okio
 
@@ -47,17 +43,18 @@ class JniZstdCompressSinkTest {
   fun writeFailure() {
     val delegate = Buffer()
     var sinkClosed = false
-    val sink = object : Sink by delegate {
-      override fun write(source: Buffer, byteCount: Long) {
-        delegate.write(source, byteCount)
-        throw IOException("boom!")
-      }
+    val sink =
+      object : Sink by delegate {
+        override fun write(source: Buffer, byteCount: Long) {
+          delegate.write(source, byteCount)
+          throw IOException("boom!")
+        }
 
-      override fun close() {
-        delegate.close()
-        sinkClosed = true
+        override fun close() {
+          delegate.close()
+          sinkClosed = true
+        }
       }
-    }
 
     val compressor = JniZstdCompressor()
     val zstdCompressSink = ZstdCompressSink(sink.buffer(), compressor)
@@ -69,9 +66,7 @@ class JniZstdCompressSinkTest {
     assertThat(compressor.cctxPointer).isNotEqualTo(0L)
     assertThat(sinkClosed).isFalse()
 
-    assertFailsWith<IOException> {
-      zstdCompressSink.close()
-    }
+    assertFailsWith<IOException> { zstdCompressSink.close() }
     assertThat(zstdCompressSink.closed).isTrue()
     assertThat(compressor.cctxPointer).isEqualTo(0L)
     assertThat(sinkClosed).isTrue()
@@ -98,9 +93,7 @@ class JniZstdCompressSinkTest {
     pipe.source.timeout().timeout(250, TimeUnit.MILLISECONDS)
 
     ZstdInputStream(pipe.source.buffer().inputStream()).source().buffer().use { source ->
-      pipe.sink.zstdCompress().buffer().use { sink ->
-        sink.writeUtf8("hello world")
-      }
+      pipe.sink.zstdCompress().buffer().use { sink -> sink.writeUtf8("hello world") }
 
       assertThat(source.readUtf8(11)).isEqualTo("hello world")
     }
@@ -115,9 +108,7 @@ class JniZstdCompressSinkTest {
       pipe.sink.zstdCompress().buffer().use { sink ->
         sink.writeUtf8("hello world")
 
-        assertFailsWith<InterruptedIOException> {
-          source.readUtf8(11)
-        }
+        assertFailsWith<InterruptedIOException> { source.readUtf8(11) }
 
         sink.flush()
         assertThat(source.readUtf8(11)).isEqualTo("hello world")
@@ -134,9 +125,7 @@ class JniZstdCompressSinkTest {
       pipe.sink.zstdCompress().buffer().use { sink ->
         sink.writeUtf8("hello world")
 
-        assertFailsWith<InterruptedIOException> {
-          source.readUtf8(11)
-        }
+        assertFailsWith<InterruptedIOException> { source.readUtf8(11) }
       }
       assertThat(source.readUtf8(11)).isEqualTo("hello world")
     }

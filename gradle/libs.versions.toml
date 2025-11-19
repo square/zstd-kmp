@@ -18,6 +18,7 @@ okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
 shadowJar-gradle-plugin = { module = "gradle.plugin.com.github.johnrengelman:shadow", version = "8.0.0" }
 lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-6"
 testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-plugin:0.2.0"
+ktfmt = "com.facebook:ktfmt:0.59"
 
 [plugins]
 spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
