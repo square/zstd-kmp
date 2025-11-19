@@ -20,4 +20,4 @@ lubenZstdJni = "com.github.luben:zstd-jni:1.5.7-6"
 testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-plugin:0.2.0"
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "8.0.0" }
+spotless = { id = "com.diffplug.spotless", version = "8.1.0" }
