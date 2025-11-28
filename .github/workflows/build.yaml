@@ -36,7 +36,7 @@ jobs:
         with:
           submodules: true
 
-      - uses: mlugg/setup-zig@8d6198c65fb0feaa111df26e6b467fea8345e46f # v2
+      - uses: mlugg/setup-zig@fa65c4058643678a4e4a9a60513944a7d8d35440 # v2
         with:
           version: 0.14.0
 
