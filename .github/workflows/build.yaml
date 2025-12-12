@@ -45,13 +45,13 @@ jobs:
 
       - run: ./gradlew :zstd-kmp:installJvmTestDistribution
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: jni-binaries
           path: zstd-kmp/src/jvmMain/resources/jni
           if-no-files-found: error
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: zstd-kmp-jvm-tests
           path: zstd-kmp/build/install/jvmTest
@@ -66,7 +66,7 @@ jobs:
 
       - run: ./gradlew :zstd-kmp:linkNativeDebugTests
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: zstd-kmp-native-tests
           path: zstd-kmp/build/bin
@@ -106,11 +106,11 @@ jobs:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
 
-      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           name: zstd-kmp-jvm-tests
 
-      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         if: matrix.platform.native-target != 'skip'
         with:
           name: zstd-kmp-native-tests
@@ -154,7 +154,7 @@ jobs:
           emulator-boot-timeout: 20000
           script: ./gradlew assembleAndroidTest connectedCheck
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: ${{ always() }}
         with:
           name: test-report-${{ matrix.os }}
@@ -193,7 +193,7 @@ jobs:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
 
-      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           name: jni-binaries
           path: zstd-kmp/src/jvmMain/resources/jni
