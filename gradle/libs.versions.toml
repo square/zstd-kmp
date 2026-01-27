@@ -21,4 +21,4 @@ testDistributionGradlePlugin = "com.jakewharton.gradle:test-distribution-gradle-
 ktfmt = "com.facebook:ktfmt:0.61"
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "8.2.0" }
+spotless = { id = "com.diffplug.spotless", version = "8.2.1" }
