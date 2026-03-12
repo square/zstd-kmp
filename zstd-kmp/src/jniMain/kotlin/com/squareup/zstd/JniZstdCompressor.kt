@@ -17,10 +17,12 @@ package com.squareup.zstd
 
 internal class JniZstdCompressor : ZstdCompressor() {
   @JvmField
-  var cctxPointer =
+  var cctxPointer = run {
+    jniLibraryLoaded
     createZstdCompressor().also {
       if (it == 0L) throw OutOfMemoryError("createZstdCompressor failed")
     }
+  }
 
   override fun setParameter(param: Int, value: Int): Long = setParameter(cctxPointer, param, value)
 
@@ -32,18 +34,24 @@ internal class JniZstdCompressor : ZstdCompressor() {
     inputEnd: Int,
     inputStart: Int,
     mode: Int,
-  ): Long =
-    compressStream2(
-      jniPointer = jniZstdPointer,
-      cctxPointer = cctxPointer,
-      outputByteArray = outputByteArray,
-      outputEnd = outputEnd,
-      outputStart = outputStart,
-      inputByteArray = inputByteArray,
-      inputEnd = inputEnd,
-      inputStart = inputStart,
-      mode = mode,
-    )
+  ): Long {
+    val streamResult =
+      StreamResult(
+        compressStream2(
+          cctxPointer = cctxPointer,
+          outputByteArray = outputByteArray,
+          outputEnd = outputEnd,
+          outputStart = outputStart,
+          inputByteArray = inputByteArray,
+          inputEnd = inputEnd,
+          inputStart = inputStart,
+          mode = mode,
+        )
+      )
+    inputBytesProcessed = streamResult.inputBytesProcessed
+    outputBytesProcessed = streamResult.outputBytesProcessed
+    return streamResult.result
+  }
 
   override fun close() {
     val cctxPointerToClose = cctxPointer
@@ -56,7 +64,6 @@ internal class JniZstdCompressor : ZstdCompressor() {
   private external fun setParameter(cctxPointer: Long, param: Int, value: Int): Long
 
   private external fun compressStream2(
-    jniPointer: Long,
     cctxPointer: Long,
     outputByteArray: ByteArray,
     outputEnd: Int,
@@ -65,7 +72,7 @@ internal class JniZstdCompressor : ZstdCompressor() {
     inputEnd: Int,
     inputStart: Int,
     mode: Int,
-  ): Long
+  ): LongArray
 
   private external fun close(cctxPointer: Long)
 }
