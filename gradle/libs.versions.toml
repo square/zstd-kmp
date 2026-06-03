@@ -1,6 +1,6 @@
 [versions]
 compileSdk = "35"
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 minSdk = "21"
 okio = "3.17.0"
 
