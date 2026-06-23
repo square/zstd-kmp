@@ -16,28 +16,6 @@
 #include <jni.h>
 #include <zstd.h>
 
-/**
- * Support for operating on JVM objects from native code.
- *
- * Pass a pointer to this to all JNI functions that operate on JVM objects.
- */
-class JniZstd {
-public:
-  JniZstd(JNIEnv *env, jclass zstdCompressorClass, jclass zstdDecompressorClass);
-
-  jfieldID zstdCompressorOutputBytesProcessed;
-  jfieldID zstdCompressorInputBytesProcessed;
-  jfieldID zstdDecompressorOutputBytesProcessed;
-  jfieldID zstdDecompressorInputBytesProcessed;
-};
-
-JniZstd::JniZstd(JNIEnv *env, jclass zstdCompressorClass, jclass zstdDecompressorClass)
-  : zstdCompressorOutputBytesProcessed(env->GetFieldID(zstdCompressorClass, "outputBytesProcessed", "I")),
-    zstdCompressorInputBytesProcessed(env->GetFieldID(zstdCompressorClass, "inputBytesProcessed", "I")),
-    zstdDecompressorOutputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "outputBytesProcessed", "I")),
-    zstdDecompressorInputBytesProcessed(env->GetFieldID(zstdDecompressorClass, "inputBytesProcessed", "I")) {
-}
-
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_squareup_zstd_JniZstdKt_jniGetErrorName(JNIEnv* env, jobject type, jlong code) {
   auto codeSizeT = static_cast<size_t>(code);
@@ -46,13 +24,6 @@ Java_com_squareup_zstd_JniZstdKt_jniGetErrorName(JNIEnv* env, jobject type, jlon
   return env->NewStringUTF(errorString);
 }
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstdKt_createJniZstd(JNIEnv* env, jclass type) {
-  auto zstdCompressorClass = env->FindClass("com/squareup/zstd/ZstdCompressor");
-  auto zstdDecompressorClass = env->FindClass("com/squareup/zstd/ZstdDecompressor");
-  auto jniZstd = new JniZstd(env, zstdCompressorClass, zstdDecompressorClass);
-  return reinterpret_cast<jlong>(jniZstd);
-}
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_squareup_zstd_JniZstdKt_createZstdCompressor(JNIEnv* env, jclass type) {
@@ -66,9 +37,8 @@ Java_com_squareup_zstd_JniZstdCompressor_setParameter(JNIEnv* env, jobject type,
   return ZSTD_CCtx_setParameter(cctx, static_cast<ZSTD_cParameter>(param), value);
 }
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstdCompressor_compressStream2(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong cctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart, jint mode) {
-  auto jniZstd = reinterpret_cast<JniZstd*>(jniZstdPointer);
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_squareup_zstd_JniZstdCompressor_compressStream2(JNIEnv* env, jobject type, jlong cctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart, jint mode) {
   auto cctx = reinterpret_cast<ZSTD_CCtx*>(cctxPointer);
 
   auto inputByteArrayElements = env->GetByteArrayElements(inputByteArray, NULL);
@@ -85,13 +55,16 @@ Java_com_squareup_zstd_JniZstdCompressor_compressStream2(JNIEnv* env, jobject ty
     result = -ZSTD_error_GENERIC;
   }
 
-  env->SetIntField(type, jniZstd->zstdCompressorOutputBytesProcessed, static_cast<jint>(zstdOutput.pos) - outputStart);
-  env->SetIntField(type, jniZstd->zstdCompressorInputBytesProcessed, static_cast<jint>(zstdInput.pos) - inputStart);
-
   env->ReleaseByteArrayElements(inputByteArray, inputByteArrayElements, JNI_ABORT);
   env->ReleaseByteArrayElements(outputByteArray, outputByteArrayElements, 0);
 
-  return result;
+  jlong results[3];
+  results[0] = static_cast<jlong>(result);
+  results[1] = static_cast<jlong>(zstdInput.pos) - inputStart;
+  results[2] = static_cast<jlong>(zstdOutput.pos) - outputStart;
+  jlongArray resultArray = env->NewLongArray(3);
+  env->SetLongArrayRegion(resultArray, 0, 3, results);
+  return resultArray;
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -106,9 +79,8 @@ Java_com_squareup_zstd_JniZstdKt_createZstdDecompressor(JNIEnv* env, jclass type
   return reinterpret_cast<jlong>(dctx);
 }
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_squareup_zstd_JniZstdDecompressor_decompressStream(JNIEnv* env, jobject type, jlong jniZstdPointer, jlong dctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart) {
-  auto jniZstd = reinterpret_cast<JniZstd*>(jniZstdPointer);
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_squareup_zstd_JniZstdDecompressor_decompressStream(JNIEnv* env, jobject type, jlong dctxPointer, jbyteArray outputByteArray, jint outputEnd, jint outputStart, jbyteArray inputByteArray, jint inputEnd, jint inputStart) {
   auto dctx = reinterpret_cast<ZSTD_DCtx*>(dctxPointer);
 
   auto inputByteArrayElements = env->GetByteArrayElements(inputByteArray, NULL);
@@ -124,13 +96,16 @@ Java_com_squareup_zstd_JniZstdDecompressor_decompressStream(JNIEnv* env, jobject
     result = -ZSTD_error_GENERIC;
   }
 
-  env->SetIntField(type, jniZstd->zstdDecompressorOutputBytesProcessed, static_cast<jint>(zstdOutput.pos) - outputStart);
-  env->SetIntField(type, jniZstd->zstdDecompressorInputBytesProcessed, static_cast<jint>(zstdInput.pos) - inputStart);
-
   env->ReleaseByteArrayElements(inputByteArray, inputByteArrayElements, JNI_ABORT);
   env->ReleaseByteArrayElements(outputByteArray, outputByteArrayElements, 0);
 
-  return result;
+  jlong results[3];
+  results[0] = static_cast<jlong>(result);
+  results[1] = static_cast<jlong>(zstdInput.pos) - inputStart;
+  results[2] = static_cast<jlong>(zstdOutput.pos) - outputStart;
+  jlongArray resultArray = env->NewLongArray(3);
+  env->SetLongArrayRegion(resultArray, 0, 3, results);
+  return resultArray;
 }
 
 extern "C" JNIEXPORT void JNICALL
