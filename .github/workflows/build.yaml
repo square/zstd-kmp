@@ -103,7 +103,7 @@ jobs:
 
       - uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
         with:
-          distribution: 'zulu'
+          distribution: 'liberica'
           java-version-file: .github/workflows/.java-version
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
