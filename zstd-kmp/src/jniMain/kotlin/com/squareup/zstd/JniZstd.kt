@@ -15,12 +15,25 @@
  */
 package com.squareup.zstd
 
-internal val jniZstdPointer: Long = run {
-  loadNativeLibrary()
-  createJniZstd()
-}
+internal val jniLibraryLoaded: Unit by lazy { loadNativeLibrary() }
 
-@JvmName("createJniZstd") internal external fun createJniZstd(): Long
+/**
+ * Result of a native stream operation. The native function returns a [LongArray] with three
+ * elements; this class provides named access to each.
+ */
+internal class StreamResult(private val values: LongArray) {
+  /** The zstd result code. */
+  val result: Long
+    get() = values[0]
+
+  /** The number of input bytes consumed. */
+  val inputBytesProcessed: Int
+    get() = values[1].toInt()
+
+  /** The number of output bytes produced. */
+  val outputBytesProcessed: Int
+    get() = values[2].toInt()
+}
 
 @JvmName("jniGetErrorName") internal external fun jniGetErrorName(code: Long): String?
 

@@ -18,7 +18,10 @@
 
 package com.squareup.zstd
 
-actual fun getErrorName(code: Long): String? = jniGetErrorName(code)
+actual fun getErrorName(code: Long): String? {
+  jniLibraryLoaded
+  return jniGetErrorName(code)
+}
 
 actual fun zstdCompressor(): ZstdCompressor = JniZstdCompressor()
 
